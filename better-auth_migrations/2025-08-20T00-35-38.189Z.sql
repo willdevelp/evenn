@@ -45,3 +45,19 @@ create table "verification" (
     "createdAt" timestamp default CURRENT_TIMESTAMP not null, 
     "updatedAt" timestamp default CURRENT_TIMESTAMP not null
 );
+
+create table "event" (
+    "id" text not null primary key, 
+    "name" text not null, 
+    "description" text not null, 
+    "date" timestamp not null, 
+    "time" timestamp not null, 
+    "location" text not null, 
+    "price" numeric[] not null, 
+    "type" text not null, 
+    "image" text, 
+    "createdAt" timestamp default CURRENT_TIMESTAMP not null, 
+    "updatedAt" timestamp default CURRENT_TIMESTAMP not null,
+    "userId" text not null references "user" ("id") on delete cascade
+);
+    
