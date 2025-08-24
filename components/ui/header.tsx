@@ -5,6 +5,7 @@ import { LogOut } from "lucide-react"
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export async function Header() {
     return (
@@ -21,20 +22,35 @@ export const AuthButton = async() => {
     const user = await getUser();
     if(user){
         return (
-            <form action={
-                async () => {
-                    "use server";
-                    await auth.api.signOut({
-                        headers: await headers()
-                    })
-                    redirect('/login');
-                }
-            }>
-                <Button type="submit">
-                    <LogOut size={8}/>
-                    LogOut
-                </Button>
-            </form>
-        );
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="outline">{user.name}</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                    <DropdownMenuItem>
+                        <Link href="/dashboard">Dashboard</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <Link href="/profile">Profile</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <form action={
+                            async () => {
+                                "use server";
+                                await auth.api.signOut({
+                                    headers: await headers()
+                                })
+                                redirect('/login');
+                            }
+                        }>
+                            <Button type="submit">
+                                <LogOut size={8}/>
+                                LogOut
+                            </Button>
+                        </form>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+            );
     }
 }

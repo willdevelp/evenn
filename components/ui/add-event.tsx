@@ -9,27 +9,27 @@ import { getUser } from "@/lib/auth-server"
 export default async function AddEvent() {
     const user = await getUser();
 
-    async function create(formData: FormData){
-        "use server";
+    // async function create(formData: FormData){
+    //     "use server";
 
-        const sql = neon(process.env.DATABASE_URL!);
+    //     const sql = neon(process.env.DATABASE_URL!);
 
-        const name = formData.get("name");
-        const description = formData.get("description");
-        const date = formData.get("date");
-        const type = formData.get("type");
-        const location = formData.get("location");
-        const time = formData.get("time");
-        const price = formData.get("price");
-        const image = formData.get("image");
-        const userId = user?.id;
+    //     const name = formData.get("name");
+    //     const description = formData.get("description");
+    //     const date = formData.get("date");
+    //     const type = formData.get("type");
+    //     const location = formData.get("location");
+    //     const time = formData.get("time");
+    //     const price = formData.get("price");
+    //     const image = formData.get("image");
+    //     const userId = user?.id;
 
-        await sql("INSERT INTO event (name, description, date, time, location, price, type, image, userId) VALUES (${name}, ${description}, ${date}, ${time}, ${location}, ${price}, ${type}, ${image}, ${userId})", [name, description, date, time, location, price, type, image, userId]);
+    //     await sql("INSERT INTO event (name, description, date, time, location, price, type, image, userId) VALUES (${name}, ${description}, ${date}, ${time}, ${location}, ${price}, ${type}, ${image}, ${userId})", [name, description, date, time, location, price, type, image, userId]);
 
-    }
+    // }
     return (
         <Dialog>
-        <form action={create}>
+        <form action="">
             <DialogTrigger asChild>
                 <Button variant="outline">Ajouter un événement</Button>
             </DialogTrigger>

@@ -2,17 +2,12 @@
 
 import { neon } from '@neondatabase/serverless';
 
-async function getData() {
+export async function getServerSideProps({ query }: { query: { id: string } } ) {
 
-  const sql = neon(process.env.DATABASE_URL!);
+    const sql = neon(process.env.DATABASE_URL!);
+    const { id } = query;
 
-  const response = await sql`SELECT version()`;
-  return response[0].version;
-}
-
-export default async function Page() {
-  const data = await getData();
-  return (
-    {data}
-  )
-}
+    const response = await sql`SELECT * FROM event WHERE userId = id`;
+    
+    return { props: { data: response[0].version } };
+  }
