@@ -23,7 +23,8 @@ type EventData = {
   image: string;
   place: number;
   price: number;
-}[];
+  prices?: number[]; // Added since your API returns this
+};
 
 export default function ReserveForm({ data }: { data: EventData }) {
 
@@ -63,7 +64,7 @@ export default function ReserveForm({ data }: { data: EventData }) {
           </DialogTrigger>
       
           <DialogContent>
-            <form onSubmit={handleReserve}>
+            <form onSubmit={handleReserve} className="space-y-3">
               <DialogHeader>
                 <DialogTitle>{"Réserver cet évènement"}</DialogTitle>
                 <DialogDescription>
@@ -74,7 +75,7 @@ export default function ReserveForm({ data }: { data: EventData }) {
               <div className="space-y-3">
                 <div className="space-y-2">
                   <Label>{"Nom de l'évènement"}</Label>
-                  <Input type="text" value={data[0].title} name="title" readOnly />
+                  <Input type="text" value={data.title} name="title" readOnly />
                 </div>
       
                 <div className="space-y-2">
@@ -84,9 +85,11 @@ export default function ReserveForm({ data }: { data: EventData }) {
                       <SelectValue placeholder="Sélectionner un prix" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem key={data[0].price} value={data[0].price.toString()}>
-                        {data[0].price} FCFA
-                      </SelectItem>
+                      {data.prices?.map((price) => (
+                        <SelectItem key={price} value={price.toString()}>
+                          {price} FCFA
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>

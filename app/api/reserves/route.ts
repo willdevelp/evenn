@@ -6,6 +6,18 @@ const sql = postgres(process.env.DATABASE_URL!, {
     ssl: "require",
 });
 
+export async function GET() {
+    try {
+        const reserves = await sql`
+            SELECT * FROM reserves
+        `;
+        return Response.json(reserves, { status: 200 });
+    } catch (error) {
+        console.error("Erreur GET /api/reserves:", error);
+        return Response.json({ error: "Impossible de récupérer les réservations" }, { status: 500 });
+    }
+}
+
 export async function POST(request: NextRequest) {
     try {
 
@@ -22,7 +34,7 @@ export async function POST(request: NextRequest) {
             RETURNING *
         `;
 
-        return Response.json(reserve, { status: 201 });
+        return Response.json(reserve[0], { status: 201 });
     } catch (error) {
         console.error("Erreur POST /api/reserves:", error);
         return Response.json({ error: "Impossible de créer la reservation" }, { status: 500 });

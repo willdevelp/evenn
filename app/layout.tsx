@@ -3,20 +3,21 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/src/components/ui/sonner";
 import { ThemeProvider } from "@/src/components/ui/theme-provider";
-import { Header } from "@/src/components/ui/header";
+// import Header from "@/src/components/ui/header";
 import { cn } from "@/lib/utils";
 import { ReserveProvider } from "@/context/ReserveContext";
-import Link from "next/link";
+// import Footer from "@/src/components/ui/footer";
+// import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -31,16 +32,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-      <Link
+      {/* <Link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Geist+Mono&display=swap"
-        />
+        /> */}
       </head>
       <body
         className={cn(
-          "font-sans space-y-4",
+          "font-sans",
           geistSans.variable,
-          // geistMono.variable,
+          geistMono.variable,
         )}
       >
         <ThemeProvider
@@ -50,9 +51,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ReserveProvider>
-            <Header />
+            {/* <Header /> */}
             {children}
             <Toaster />
+            {/* <Footer/> */}
           </ReserveProvider>
         </ThemeProvider>
       </body>
