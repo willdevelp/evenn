@@ -41,7 +41,7 @@ export default function HomePage() {
                 Explorer les événements
               </Link>
               <Link
-                href="/organize"
+                href="/pricing"
                 className="border border-white px-6 py-3 rounded-md font-semibold hover:bg-white hover:text-indigo-700 transition"
               >
                 Organiser un événement
@@ -127,7 +127,7 @@ export default function HomePage() {
               Publiez vos événements sur Evenn, touchez un large public et gérez vos réservations en toute simplicité.
             </p>
             <Link
-              href="/organize"
+              href="/pricing"
               className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-indigo-700 transition"
             >
               Créer un événement
