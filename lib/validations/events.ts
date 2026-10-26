@@ -1,0 +1,53 @@
+import { z } from "zod";
+import { ContentStatusSchema, VisibilityLevelSchema } from "./enums";
+
+export const EventsInsertSchema = z.object({
+  "address": z.string().nullable().optional(),
+  "category_id": z.string().nullable().optional(),
+  "city": z.string().nullable().optional(),
+  "country_code": z.string().optional(),
+  "cover_url": z.string().nullable().optional(),
+  "created_at": z.string().optional(),
+  "deleted_at": z.string().nullable().optional(),
+  "description": z.string().nullable().optional(),
+  "id": z.string().optional(),
+  "is_featured": z.boolean().optional(),
+  "latitude": z.number().nullable().optional(),
+  "longitude": z.number().nullable().optional(),
+  "organization_id": z.string(),
+  "published_at": z.string().nullable().optional(),
+  "refund_policy": z.string().nullable().optional(),
+  "slug": z.string(),
+  "status": ContentStatusSchema.optional(),
+  "timezone": z.string().optional(),
+  "title": z.string(),
+  "updated_at": z.string().optional(),
+  "venue_name": z.string().nullable().optional(),
+  "visibility": VisibilityLevelSchema.optional(),
+}).strict();
+
+export const EventsUpdateSchema = z.object({
+  "address": z.string().nullable().optional(),
+  "category_id": z.string().nullable().optional(),
+  "city": z.string().nullable().optional(),
+  "country_code": z.string().optional(),
+  "cover_url": z.string().nullable().optional(),
+  "created_at": z.string().optional(),
+  "deleted_at": z.string().nullable().optional(),
+  "description": z.string().nullable().optional(),
+  "id": z.string().optional(),
+  "is_featured": z.boolean().optional(),
+  "latitude": z.number().nullable().optional(),
+  "longitude": z.number().nullable().optional(),
+  "organization_id": z.string().optional(),
+  "published_at": z.string().nullable().optional(),
+  "refund_policy": z.string().nullable().optional(),
+  "slug": z.string().optional(),
+  "status": ContentStatusSchema.optional(),
+  "timezone": z.string().optional(),
+  "title": z.string().optional(),
+  "updated_at": z.string().optional(),
+  "venue_name": z.string().nullable().optional(),
+  "visibility": VisibilityLevelSchema.optional(),
+}).strict();
+

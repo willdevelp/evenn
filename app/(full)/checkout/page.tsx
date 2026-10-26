@@ -1,33 +1,16 @@
-"use client";
+import { getReservation } from "@/lib/actions/reservations/get-reservation";
+import CheckoutClient from "./CheckoutClient";
 
-import { useReserve } from "@/context/ReserveContext";
-import Code from "@/src/components/ui/code";
+export const dynamic = "force-dynamic";
 
-export default function CheckOut() {
-    const { reserve } = useReserve();
+export default async function CheckOut({
+  searchParams,
+}: {
+  searchParams: Promise<{ order?: string | string[] }>;
+}) {
+  const params = await searchParams;
+  const orderId = Array.isArray(params.order) ? params.order[0] : params.order;
+  const reservation = orderId ? await getReservation(orderId) : null;
 
-    if (!reserve) {
-        return (
-            <div className="p-6">
-                <h1 className="text-xl font-bold mb-4">Aucune réservation trouvée</h1>
-            </div>
-        );
-    }
-
-    const total = reserve.price * reserve.quantity;
-
-    return (
-        <div className="p-6">
-            <h1 className="text-xl font-bold mb-4">Récapitulatif</h1>
-            <p>Événement : {reserve.title}</p>
-            <p>Prix unitaire : {reserve.price} FCFA</p>
-            <p>Quantité : {reserve.quantity}</p>
-            <p className="font-semibold">
-                Total : {total} FCFA
-            </p>
-            <p>Amusez-vous bien !</p>
-
-            <Code reserve={[reserve]} />
-        </div>
-    );
+  return <CheckoutClient orderId={orderId} reservation={reservation} />;
 }

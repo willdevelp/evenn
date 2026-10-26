@@ -1,12 +1,14 @@
-import TBar from "@/src/components/ui/tbar"
+import { requireUser } from "@/lib/session";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <div>
-      <TBar />
-      <main className="w-4/5 float-right">
-        {children}
-      </main>
-    </div>
-  )
+/**
+ * Layout protégé du tableau de bord : redirige vers la connexion
+ * si aucune session valide n'est trouvée.
+ */
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  await requireUser("/dashboard");
+  return <>{children}</>;
 }

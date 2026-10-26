@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Evenn
 
-## Getting Started
+Plateforme d'événements : billetterie, mini-sites, cagnottes, votes et RSVP.
 
-First, run the development server:
+## Authentification
+
+L'authentification est gérée par [Better Auth](https://better-auth.com) avec un
+adaptateur PostgreSQL (`pg`) et un mappage explicite des colonnes vers le schéma
+SQL existant (voir `lib/auth.ts`).
+
+### Méthodes activées
+
+| Méthode | Configuration |
+|---|---|
+| Email / mot de passe | `emailAndPassword` |
+| Google OAuth | `socialProviders.google` |
+| Téléphone (OTP 6 chiffres) | plugin `phoneNumber` |
+| Rôles / bannissement / impersonation | plugin `admin` |
+
+### Tables utilisées
+
+`user`, `session`, `account`, `verification`.
+
+Le schéma n'utilise pas la convention snake_case de Better Auth : chaque champ est
+mappé explicitement :
+
+```
+user          : emailVerified, createdAt, updatedAt, countryCode, locale,
+                lastLoginAt, deletedAt, phoneNumber (plugin), role/banned (plugin admin)
+session       : expiresAt, createdAt, updatedAt, ipAddress, userAgent, userId, impersonatedBy
+account       : accountId, providerId, userId, accessToken, refreshToken, idToken,
+                accessTokenExpiresAt*, refreshTokenExpiresAt*, scope, createdAt, updatedAt
+verification  : expiresAt, createdAt, updatedAt
+```
+
+\* `timestamptz` côté SQL : Better Auth reçoit/renvoie des `Date`.
+
+### Variables d'environnement
+
+```
+DATABASE_URL=postgres://...
+BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_SECRET=<32+ caractères>
+TICKET_SECRET=<32+ caractères>   # signature HMAC des QR codes de billets
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+```
+
+### Routes
+
+| Route | Rôle |
+|---|---|
+| `POST/GET /api/auth/[...all]` | Endpoints Better Auth |
+| `/auth/login` | Connexion (email/mot de passe + Google) |
+| `/auth/register` | Inscription (email/mot de passe + Google, téléphone optionnel) |
+| `/auth/verify-phone` | Vérification du numéro par code OTP |
+
+Le dossier `/dashboard` est protégé par `app/dashboard/layout.tsx`
+(`requireUser` dans `lib/session.ts`).
+
+### Envoi des OTP / emails
+
+`sendOTP` dans `lib/auth.ts` est un point d'extension : branchez-y votre
+fournisseur SMS/WhatsApp. En développement, le code est affiché dans la console
+du serveur.
+
+## Développement
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ouvrez [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run build   # build de production
+npm run lint    # ESLint
+```

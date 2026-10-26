@@ -49,3 +49,12 @@ export type Plan = {
   created_at: string // ISO string (timestamp)
   updated_at: string // ISO string (timestamp)
 }
+
+export type Ticket = {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  event_title: string;
+  sold: number;
+};

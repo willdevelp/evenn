@@ -1,55 +1,48 @@
 // components/Footer.tsx
 import Link from "next/link";
-import { FaFacebook, FaInstagram, FaXTwitter, FaLinkedin } from "react-icons/fa6";
+import { ArrowUpRight } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-300 pt-12 pb-6 px-4">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 border-b border-gray-700 pb-10">
-        {/* Logo + Description */}
-        <div>
-          <h2 className="text-2xl font-bold text-white mb-3">Evenn</h2>
-          <p className="text-sm">
-            Plateforme dédiée aux événements uniques, professionnels ou festifs.
-            Explorez, réservez et vivez des expériences inoubliables.
+    <footer className="border-t border-slate-800 bg-slate-950 px-4 pb-6 pt-12 text-slate-300 sm:px-6">
+      <div className="mx-auto grid max-w-7xl gap-10 border-b border-white/10 pb-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr]">
+        <div className="max-w-sm">
+          <Link href="/" className="inline-flex items-center gap-2.5 text-xl font-extrabold tracking-tight text-white">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500 text-sm">E</span>
+            Evenn
+          </Link>
+          <p className="mt-4 text-sm leading-6 text-slate-400">
+            Découvrez, créez et partagez des expériences qui rassemblent.
           </p>
         </div>
 
-        {/* Navigation */}
         <div>
-          <h3 className="text-xl font-semibold text-white mb-4">Navigation</h3>
-          <ul className="space-y-2 text-sm">
-            <li><Link href="/" className="hover:underline">Accueil</Link></li>
-            <li><Link href="/events" className="hover:underline">Événements</Link></li>
-            <li><Link href="/contact" className="hover:underline">Contact</Link></li>
-            <li><Link href="/about" className="hover:underline">À propos</Link></li>
-            <li><Link href="/legal" className="hover:underline">Mentions légales</Link></li>
+          <h3 className="text-sm font-semibold text-white">Explorer</h3>
+          <ul className="mt-4 space-y-3 text-sm">
+            <li><Link href="/events" className="transition hover:text-white">Événements</Link></li>
+            <li><Link href="/pricing" className="transition hover:text-white">Tarifs</Link></li>
+            <li><Link href="/about" className="transition hover:text-white">À propos</Link></li>
           </ul>
         </div>
 
-        {/* Réseaux sociaux */}
         <div>
-          <h3 className="text-xl font-semibold text-white mb-4">Suivez-nous</h3>
-          <div className="flex space-x-5 text-xl">
-            <Link href="https://facebook.com" target="_blank" aria-label="Facebook" className="hover:text-white">
-              <FaFacebook />
-            </Link>
-            <Link href="https://instagram.com" target="_blank" aria-label="Instagram" className="hover:text-white">
-              <FaInstagram />
-            </Link>
-            <Link href="https://twitter.com" target="_blank" aria-label="Twitter / X" className="hover:text-white">
-              <FaXTwitter />
-            </Link>
-            <Link href="https://linkedin.com" target="_blank" aria-label="LinkedIn" className="hover:text-white">
-              <FaLinkedin />
-            </Link>
-          </div>
+          <h3 className="text-sm font-semibold text-white">Besoin d’aide ?</h3>
+          <ul className="mt-4 space-y-3 text-sm">
+            <li><Link href="/contact" className="transition hover:text-white">Contactez-nous</Link></li>
+            <li>
+              <Link href="/auth/register" className="inline-flex items-center gap-1 transition hover:text-white">
+                Créer un compte <ArrowUpRight size={14} />
+              </Link>
+            </li>
+          </ul>
         </div>
       </div>
-
-      {/* Bottom bar */}
-      <div className="text-center text-sm text-gray-500 pt-6">
-        © {new Date().getFullYear()} Evenn. Tous droits réservés.
+      <div className="mx-auto flex max-w-7xl flex-col gap-2 pt-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        <p>© {new Date().getFullYear()} Evenn. Tous droits réservés.</p>
+        <div className="flex gap-4">
+          <Link href="/legal" className="transition hover:text-slate-300">Mentions légales</Link>
+          <Link href="/contact" className="transition hover:text-slate-300">Confidentialité</Link>
+        </div>
       </div>
     </footer>
   );

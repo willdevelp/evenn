@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { createEvent } from "@/lib/actions/events/create-event";
 
 export function EventForm() {
     const router = useRouter();
@@ -10,16 +11,57 @@ export function EventForm() {
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         setLoading(true);
+
         try {
             const formData = new FormData(event.currentTarget);
-            const response = await fetch("/api/events", {
-                method: "POST",
-                body: formData,
-            });
-            if (!response.ok) {
-                throw new Error("Failed to create event");
+            const file = formData.get("image") as File;
+
+            let imageUrl = "";
+
+            // 🔥 Upload image si elle existe
+            if (file && file.size > 0) {
+                const data = new FormData();
+                data.append("file", file);
+                data.append("upload_preset", "evenn_upload"); // ⚠️ à créer sur Cloudinary
+
+                const uploadRes = await fetch(
+                    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+                    {
+                        method: "POST",
+                        body: data,
+                    }
+                );
+
+                const uploadData = await uploadRes.json();
+                imageUrl = uploadData.secure_url;
             }
+
+            const pricesArray = formData.get("prices")
+                ?.toString()
+                .split(",")
+                .map(p => parseInt(p.trim(), 10))
+                .filter(p => !isNaN(p));
+
+            // 🔥 Construire payload final
+            const quantity = Number(formData.get("place"));
+            const tickets = (pricesArray ?? []).map((price, index) => ({
+                name: `Ticket ${index + 1}`,
+                price,
+                quantity,
+            }));
+
+            await createEvent({
+                title: String(formData.get("title")),
+                description: String(formData.get("description")),
+                date: String(formData.get("date")),
+                time: String(formData.get("time")),
+                location: String(formData.get("location")),
+                image: imageUrl,
+                tickets,
+            });
+
             router.push("/dashboard/events");
+
         } catch (error) {
             console.error(error);
         } finally {
@@ -125,7 +167,7 @@ export function EventForm() {
                         Image (URL)
                     </label>
                     <input
-                        type="url"
+                        type="file"
                         id="image"
                         name="image"
                         className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"

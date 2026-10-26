@@ -1,0 +1,51 @@
+import { z } from "zod";
+import { ContestModeSchema, ResultsVisibilitySchema, ContentStatusSchema } from "./enums";
+
+export const ContestsInsertSchema = z.object({
+  "cover_url": z.string().nullable().optional(),
+  "created_at": z.string().optional(),
+  "currency": z.string().optional(),
+  "deleted_at": z.string().nullable().optional(),
+  "description": z.string().nullable().optional(),
+  "ends_at": z.string(),
+  "id": z.string().optional(),
+  "max_votes_per_person_day": z.number().nullable().optional(),
+  "mode": ContestModeSchema.optional(),
+  "organization_id": z.string(),
+  "price_per_vote": z.number().optional(),
+  "published_at": z.string().nullable().optional(),
+  "require_otp_for_free": z.boolean().optional(),
+  "results_frozen_at": z.string().nullable().optional(),
+  "results_visibility": ResultsVisibilitySchema.optional(),
+  "rules": z.string().nullable().optional(),
+  "slug": z.string(),
+  "starts_at": z.string(),
+  "status": ContentStatusSchema.optional(),
+  "title": z.string(),
+  "updated_at": z.string().optional(),
+}).strict();
+
+export const ContestsUpdateSchema = z.object({
+  "cover_url": z.string().nullable().optional(),
+  "created_at": z.string().optional(),
+  "currency": z.string().optional(),
+  "deleted_at": z.string().nullable().optional(),
+  "description": z.string().nullable().optional(),
+  "ends_at": z.string().optional(),
+  "id": z.string().optional(),
+  "max_votes_per_person_day": z.number().nullable().optional(),
+  "mode": ContestModeSchema.optional(),
+  "organization_id": z.string().optional(),
+  "price_per_vote": z.number().optional(),
+  "published_at": z.string().nullable().optional(),
+  "require_otp_for_free": z.boolean().optional(),
+  "results_frozen_at": z.string().nullable().optional(),
+  "results_visibility": ResultsVisibilitySchema.optional(),
+  "rules": z.string().nullable().optional(),
+  "slug": z.string().optional(),
+  "starts_at": z.string().optional(),
+  "status": ContentStatusSchema.optional(),
+  "title": z.string().optional(),
+  "updated_at": z.string().optional(),
+}).strict();
+
