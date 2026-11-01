@@ -76,3 +76,47 @@ Ouvrez [http://localhost:3000](http://localhost:3000).
 npm run build   # build de production
 npm run lint    # ESLint
 ```
+
+## Votes payants
+
+Le module de vote public est disponible sur `/vote` et `/vote/[slug]`.
+
+### Parcours de paiement
+
+1. `createVoteOrder` crée une commande `orders` (`kind = 'vote'`, statut
+   `pending`), une ligne `vote_purchases` et un paiement `pending`.
+   Le nombre de votes et le montant sont **recalculés côté serveur** à partir du
+   concours, du candidat et du pack : aucune valeur envoyée par le client n'est
+   utilisée pour le prix.
+2. Le prestataire envoie ensuite une notification signée sur
+   `POST /api/webhooks/[provider]`.
+3. `processWebhook` vérifie la signature, l'idempotence et le montant, puis
+   `fulfillPaidOrder` insère les votes et les écritures comptables dans une
+   seule transaction. Les triggers SQL mettent à jour `candidates.vote_count`.
+4. La page `/vote/checkout?order=<uuid>` suit le statut et ne crédite jamais de
+   votes avant la confirmation.
+
+En développement, le fournisseur `mock` est actif et un bouton
+« Simuler le paiement (dev) » signe une notification avec le même HMAC que le
+webhook réel. Pour tester manuellement :
+
+```bash
+# Corps brut, signé avec MOCK_WEBHOOK_SECRET
+curl -X POST http://localhost:3000/api/webhooks/mock \
+  -H "Content-Type: application/json" \
+  -H "x-signature: <hmac-sha256-hex>" \
+  -d '{"id":"evt_1","type":"payment.succeeded","reference":"VOTE-...","status":"succeeded","amount":5000}'
+```
+
+### Variables d'environnement
+
+```
+MOCK_WEBHOOK_SECRET=<secret de signature du fournisseur mock>
+VOTE_HASH_PEPPER=<poivre pour hacher les téléphones des votants>
+ENABLE_MOCK_PROVIDER=true   # uniquement pour une démo hors développement
+```
+
+Le fournisseur `mock` est désactivé en production sauf si
+`ENABLE_MOCK_PROVIDER=true`. Pour un vrai agrégateur (MTN MoMo, Orange Money,
+CinetPay, Campay…), ajoutez une implémentation de `PaymentProvider` dans
+`lib/payments/providers/` et exposez-la dans `providers/index.ts`.

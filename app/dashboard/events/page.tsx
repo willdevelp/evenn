@@ -499,7 +499,6 @@ import {
   MapPin,
   Calendar,
   PlusCircle,
-  Edit,
   Eye,
   Ticket,
   Trash2,
@@ -691,13 +690,6 @@ export default function DashboardEventsPage() {
                             className="rounded-lg p-2 text-[#2563EB] transition hover:bg-[#2563EB]/10"
                           >
                             <Eye size={18} />
-                          </Link>
-                          <Link
-                            href={`/dashboard/events/${event.id}/edit`}
-                            aria-label={`Modifier ${event.title}`}
-                            className="rounded-lg p-2 text-gray-400 transition hover:bg-[#2563EB]/10 hover:text-[#2563EB]"
-                          >
-                            <Edit size={18} />
                           </Link>
                           <button
                             type="button"

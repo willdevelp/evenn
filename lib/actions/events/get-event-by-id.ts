@@ -18,6 +18,7 @@ export type EventDetail = {
   slug: string;
   description: string | null;
   category: string | null;
+  category_id: string | null;
   status: string;
   visibility: string;
   country_code: string;
@@ -29,6 +30,11 @@ export type EventDetail = {
   venue_name: string | null;
   address: string | null;
   city: string | null;
+  /** Coordonnées GPS, lorsqu'elles sont renseignées. */
+  latitude: number | null;
+  longitude: number | null;
+  /** Organisateur (nom de l'organisation propriétaire). */
+  organization_name: string | null;
   /** Ancien champ agrégé `location` : "venue_name, city". */
   location: string;
 
@@ -60,14 +66,18 @@ export async function getEventById(id: string): Promise<EventDetail | null> {
     `SELECT
         e.id, e.title, e.slug, e.description,
         c.name_fr   AS category,
+        e.category_id,
+        o.name      AS organization_name,
         e.status::text     AS status,
         e.visibility::text AS visibility,
         e.country_code, e.timezone,
         e.cover_url, e.venue_name, e.address, e.city,
+        e.latitude, e.longitude,
         d.starts_at AS date, d.ends_at,
         CONCAT_WS(', ', NULLIF(e.venue_name, ''), NULLIF(e.city, '')) AS location
       FROM events e
       LEFT JOIN categories c ON c.id = e.category_id
+      LEFT JOIN organizations o ON o.id = e.organization_id
       LEFT JOIN LATERAL (
         SELECT starts_at, ends_at
           FROM event_dates
@@ -118,6 +128,7 @@ export async function getEventById(id: string): Promise<EventDetail | null> {
     slug: event.slug,
     description: event.description,
     category: event.category,
+    category_id: event.category_id,
     status: event.status,
     visibility: event.visibility,
     country_code: event.country_code,
@@ -127,6 +138,9 @@ export async function getEventById(id: string): Promise<EventDetail | null> {
     venue_name: event.venue_name,
     address: event.address,
     city: event.city,
+    latitude: event.latitude === null ? null : Number(event.latitude),
+    longitude: event.longitude === null ? null : Number(event.longitude),
+    organization_name: event.organization_name,
     location: event.location || event.city || "",
     date: startsAt,
     ends_at: event.ends_at ? new Date(event.ends_at).toISOString() : null,
@@ -150,6 +164,8 @@ export async function getEventsById(
         e.slug,
         e.description,
         c.name_fr AS category,
+        e.category_id,
+        o.name AS organization_name,
         e.status::text AS status,
         e.visibility::text AS visibility,
         e.country_code,
@@ -158,6 +174,8 @@ export async function getEventsById(
         e.venue_name,
         e.address,
         e.city,
+        e.latitude,
+        e.longitude,
         d.starts_at AS date,
         d.ends_at,
         CONCAT_WS(
@@ -168,6 +186,8 @@ export async function getEventsById(
       FROM events e
       LEFT JOIN categories c
         ON c.id = e.category_id
+      LEFT JOIN organizations o
+        ON o.id = e.organization_id
       LEFT JOIN LATERAL (
         SELECT starts_at, ends_at
         FROM event_dates
@@ -239,6 +259,7 @@ export async function getEventsById(
     slug: event.slug,
     description: event.description,
     category: event.category,
+    category_id: event.category_id,
     status: event.status,
     visibility: event.visibility,
     country_code: event.country_code,
@@ -248,6 +269,9 @@ export async function getEventsById(
     venue_name: event.venue_name,
     address: event.address,
     city: event.city,
+    latitude: event.latitude === null ? null : Number(event.latitude),
+    longitude: event.longitude === null ? null : Number(event.longitude),
+    organization_name: event.organization_name,
     location: event.location || event.city || "",
     date: startsAt,
     ends_at: event.ends_at
@@ -265,4 +289,61 @@ export async function getEventsById(
     ),
     revenue: Number(revenue[0]?.amount ?? 0),
   };
+}
+
+export type SimilarEvent = {
+  id: string;
+  title: string;
+  date: string | null;
+  price: number | null;
+};
+
+/**
+ * Événements publiés de la même catégorie ou de la même ville,
+ * hors événement courant, triés par date.
+ */
+export async function getSimilarEvents(
+  id: string,
+  categoryId: string | null,
+  city: string | null,
+  limit = 4,
+): Promise<SimilarEvent[]> {
+  if (!categoryId && !city) return [];
+
+  const { rows } = await pool.query(
+    `SELECT
+        e.id,
+        e.title,
+        d.starts_at AS date,
+        MIN(tt.price_amount) AS price
+       FROM events e
+       LEFT JOIN LATERAL (
+         SELECT starts_at
+           FROM event_dates
+          WHERE event_id = e.id
+          ORDER BY starts_at ASC
+          LIMIT 1
+       ) d ON TRUE
+       LEFT JOIN ticket_types tt
+         ON tt.event_id = e.id AND tt.is_active = true
+      WHERE e.id <> $1
+        AND e.deleted_at IS NULL
+        AND e.status::text = 'published'
+        AND e.visibility::text = 'public'
+        AND (
+          ($2::uuid IS NOT NULL AND e.category_id = $2::uuid)
+          OR ($3::text IS NOT NULL AND lower(e.city) = lower($3::text))
+        )
+      GROUP BY e.id, e.title, d.starts_at
+      ORDER BY d.starts_at ASC NULLS LAST
+      LIMIT $4`,
+    [id, categoryId, city, limit],
+  );
+
+  return rows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    date: row.date ? new Date(row.date).toISOString() : null,
+    price: row.price === null ? null : Number(row.price),
+  }));
 }

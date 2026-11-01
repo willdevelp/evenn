@@ -1,17 +1,13 @@
-// app/events/[slug]/page.js
-import { notFound } from 'next/navigation';
-import { getEventsById } from '@/lib/actions/events/get-event-by-id';
-import { getEvent } from '@/lib/actions/events/get-events';
-import EventDetailClient from './EventDetailClient';
+import { notFound } from "next/navigation";
 
-// Génération des paramètres statiques pour le build
-export async function generateStaticParams() {
-  const events = await getEvent();
+import { getEventsById, getSimilarEvents } from "@/lib/actions/events/get-event-by-id";
+import EventDetailClient from "./EventDetailClient";
 
-  return events.map((event) => ({
-    id: String(event.id),
-  }));
-}
+export const dynamic = "force-dynamic";
+
+export const metadata = {
+  title: "Événement | Evenn",
+};
 
 export default async function EventDetailPage({
   params,
@@ -24,23 +20,31 @@ export default async function EventDetailPage({
   }
 
   const storedEvent = await getEventsById(id);
-  console.log('storedEvent:', storedEvent);
 
   if (!storedEvent) {
     notFound();
   }
 
+  const similarEvents = await getSimilarEvents(
+    storedEvent.id,
+    storedEvent.category_id,
+    storedEvent.city,
+  );
+
   const event = {
     id: storedEvent.id,
-    category: storedEvent.category ?? 'Événement',
+    category: storedEvent.category ?? "Événement",
     title: storedEvent.title,
-    date: storedEvent.date ?? '',
+    date: storedEvent.date ?? "",
     time: storedEvent.time,
     location: storedEvent.location,
-    image: storedEvent.cover_url ?? '',
-    city: storedEvent.city ?? storedEvent.location,
-    organizer: 'Organisateur',
-    description: storedEvent.description ?? '',
+    address: storedEvent.address ?? "",
+    city: storedEvent.city ?? "",
+    latitude: storedEvent.latitude,
+    longitude: storedEvent.longitude,
+    image: storedEvent.cover_url ?? "",
+    organizer: storedEvent.organization_name ?? "",
+    description: storedEvent.description ?? "",
     tickets: storedEvent.tickets.map((ticket) => ({
       id: ticket.id,
       name: ticket.name,
@@ -51,8 +55,7 @@ export default async function EventDetailPage({
       available: ticket.quantity > ticket.sold,
     })),
     attendees: storedEvent.total_sold,
-    rating: 0,
   };
 
-  return <EventDetailClient event={event} similarEvents={[]} />;
+  return <EventDetailClient event={event} similarEvents={similarEvents} />;
 }

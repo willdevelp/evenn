@@ -1,28 +1,40 @@
-// app/organizer/[slug]/page.js
-import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import {
-  Calendar,
-  MapPin,
-  Users,
-  Star,
-  Facebook,
-  Instagram,
-  Twitter,
-  Linkedin,
-  Globe,
+  ArrowLeft,
+  BadgeCheck,
   CalendarDays,
-  ArrowRight,
-} from 'lucide-react';
-import { getOrganizerBySlug, getEventsByOrganizerId, organizersData } from '@/lib/bd';
+  Globe,
+  Link2,
+  MapPin,
+  Ticket,
+  Users,
+} from "lucide-react";
 
-// Génération des paramètres statiques
-export async function generateStaticParams() {
-  return organizersData.map((org) => ({
-    slug: org.slug,
-  }));
-}
+import DashboardShell from "@/src/components/dashboard/DashboardShell";
+import { getOrganizerProfile } from "@/lib/actions/dashboard/get-dashboard-data";
+
+export const dynamic = "force-dynamic";
+
+const formatDate = (value: string | null) => {
+  if (!value) return "Date à définir";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date à définir";
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+};
+
+const socialLabels: Record<string, string> = {
+  facebook: "Facebook",
+  instagram: "Instagram",
+  twitter: "X / Twitter",
+  linkedin: "LinkedIn",
+  youtube: "YouTube",
+};
 
 export default async function OrganizerProfilePage({
   params,
@@ -30,245 +42,211 @@ export default async function OrganizerProfilePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const organizer = getOrganizerBySlug(slug);
+  const organizer = await getOrganizerProfile(slug);
 
   if (!organizer) {
     notFound();
   }
 
-  const events = getEventsByOrganizerId(organizer.id);
-  const pastEvents = events.filter(e => e.status === 'past');
-  const upcomingEvents = events.filter(e => e.status === 'upcoming' || e.status === 'ongoing');
+  const now = Date.now();
+  const upcoming = organizer.events.filter(
+    (event) => !event.date || new Date(event.date).getTime() >= now,
+  );
+  const past = organizer.events.filter(
+    (event) => event.date && new Date(event.date).getTime() < now,
+  );
 
-  // Social icons mapping
-  const socialIcons: Record<string, typeof Facebook> = {
-    facebook: Facebook,
-    instagram: Instagram,
-    twitter: Twitter,
-    linkedin: Linkedin,
-    website: Globe,
-  };
+  const socialEntries = Object.entries(organizer.socialLinks).filter(
+    ([, value]) => typeof value === "string" && value.trim().length > 0,
+  );
+
+  const totalCapacity = organizer.events.reduce((total, event) => total + event.capacity, 0);
 
   return (
-    <main className="font-sans antialiased bg-white text-gray-900 min-h-screen">
-
-      {/* ===== HEADER ===== */}
-      <header className="border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="text-2xl font-extrabold text-[#2563EB]">Evenza</Link>
-            <span className="text-xs font-medium bg-[#0EA5E9]/10 text-[#0EA5E9] px-2 py-0.5 rounded-full">Organisateur</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
-            <Link href="/" className="hover:text-[#2563EB] transition">Accueil</Link>
-            <Link href="/events" className="hover:text-[#2563EB] transition">Explorer</Link>
-            <Link href="#" className="hover:text-[#2563EB] transition">À venir</Link>
-            <Link href="#" className="hover:text-[#2563EB] transition">Mon compte</Link>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Link href="#" className="hidden sm:inline-block text-sm font-medium text-[#2563EB] hover:underline">Se connecter</Link>
-            <Link href="#" className="bg-[#2563EB] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-[#2563EB]/25 hover:shadow-[#2563EB]/40 hover:bg-[#1d4ed8] transition-all flex items-center gap-1">
-              Créer un événement
-              <ArrowRight size={16} />
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* ===== SECTION PROFIL ===== */}
-      <section className="relative bg-gradient-to-r from-[#0EA5E9]/10 to-[#2563EB]/10 py-12 border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-            {/* Logo */}
-            <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl bg-white shadow-xl border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-              {organizer.logo ? (
-                <Image src={organizer.logo} alt={organizer.name} width={160} height={160} className="object-cover" />
+    <DashboardShell
+      title={organizer.name}
+      description="Profil public de l’organisation."
+      action={
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+        >
+          <ArrowLeft className="size-4" /> Tableau de bord
+        </Link>
+      }
+    >
+      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-200/50">
+        <div className="h-24 bg-gradient-to-r from-brand-600 to-brand-500" />
+        <div className="px-5 pb-6 sm:px-6">
+          <div className="-mt-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex items-end gap-4">
+              {organizer.logoUrl ? (
+                <Image
+                  src={organizer.logoUrl}
+                  alt={`Logo de ${organizer.name}`}
+                  width={80}
+                  height={80}
+                  unoptimized
+                  className="size-20 rounded-2xl border-4 border-white bg-white object-cover shadow-sm"
+                />
               ) : (
-                <span className="text-4xl font-extrabold text-[#2563EB]">
-                  {organizer.name.charAt(0)}
+                <span className="flex size-20 items-center justify-center rounded-2xl border-4 border-white bg-slate-900 text-2xl font-bold text-white shadow-sm">
+                  {organizer.name.slice(0, 1).toUpperCase()}
                 </span>
               )}
-            </div>
-            {/* Infos */}
-            <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900">{organizer.name}</h1>
-              <p className="text-gray-600 mt-2 max-w-2xl leading-relaxed">
-                {organizer.description}
-              </p>
-              {/* Réseaux sociaux */}
-              <div className="flex flex-wrap items-center gap-3 mt-4">
-                {Object.entries(organizer.social || {}).map(([key, url]) => {
-                  const Icon = socialIcons[key as keyof typeof socialIcons];
-                  if (!Icon) return null;
-                  return (
-                    <a
-                      key={key}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 bg-white border border-gray-200 rounded-xl hover:border-[#2563EB] hover:shadow-md transition text-gray-600 hover:text-[#2563EB]"
-                      title={key}
-                    >
-                      <Icon size={20} />
-                    </a>
-                  );
-                })}
-                {(!organizer.social || Object.keys(organizer.social).length === 0) && (
-                  <span className="text-sm text-gray-400">Aucun réseau social renseigné</span>
-                )}
-              </div>
-            </div>
-            {/* Statistiques rapides */}
-            <div className="flex md:flex-col gap-4 md:gap-2 text-center bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-              <div>
-                <p className="text-2xl font-extrabold text-[#2563EB]">{events.length}</p>
-                <p className="text-xs text-gray-500">Événements</p>
-              </div>
-              <div className="hidden md:block w-12 h-px bg-gray-200 mx-auto" />
-              <div>
-                <p className="text-2xl font-extrabold text-[#0EA5E9]">
-                  {events.reduce((acc, e) => acc + e.attendees, 0)}
+              <div className="pb-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-xl font-bold text-slate-900">{organizer.name}</h1>
+                  {organizer.verificationStatus === "verified" && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
+                      <BadgeCheck className="size-3.5" /> Vérifié
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1 text-sm text-slate-500">
+                  {organizer.countryCode} · {organizer.events.length} événement(s)
                 </p>
-                <p className="text-xs text-gray-500">Participants</p>
               </div>
             </div>
+
+            <div className="flex flex-wrap gap-2">
+              {organizer.websiteUrl && (
+                <a
+                  href={organizer.websiteUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  <Globe className="size-4" /> Site web
+                </a>
+              )}
+              {socialEntries.map(([key, value]) => (
+                <a
+                  key={key}
+                  href={value}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  <Link2 className="size-4" /> {socialLabels[key] ?? key}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {organizer.description && (
+            <p className="mt-5 max-w-3xl text-sm leading-relaxed text-slate-600">
+              {organizer.description}
+            </p>
+          )}
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            {[
+              { label: "Événements", value: organizer.events.length, icon: CalendarDays },
+              { label: "Billets vendus", value: organizer.participants, icon: Users },
+              { label: "Places proposées", value: totalCapacity, icon: Ticket },
+            ].map(({ label, value, icon: Icon }) => (
+              <div key={label} className="rounded-xl border border-slate-100 bg-slate-50/60 p-4">
+                <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+                  <Icon className="size-4" /> {label}
+                </div>
+                <p className="mt-2 text-xl font-bold text-slate-900">
+                  {value.toLocaleString("fr-FR")}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ===== ÉVÉNEMENTS ===== */}
-      <section className="py-12 max-w-7xl mx-auto px-6">
-        {/* Événements à venir */}
-        {upcomingEvents.length > 0 && (
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-              <CalendarDays size={24} className="text-[#2563EB]" /> Événements à venir
-            </h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {upcomingEvents.map((event) => (
-                <Link
-                  key={event.id}
-                  href={`/events/${event.id}`}
-                  className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition p-5 group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-[#2563EB]/10 flex items-center justify-center text-2xl flex-shrink-0">
-                      🎫
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-gray-800 truncate">{event.title}</h3>
-                      <div className="flex items-center gap-1 text-xs text-gray-500">
-                        <MapPin size={12} /> {event.city}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-1 text-gray-600">
-                      <Calendar size={14} /> {event.date}
-                    </span>
-                    <span className="font-bold text-[#2563EB]">{event.price}</span>
-                  </div>
-                  <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
-                    <Users size={12} /> {event.attendees} participants
-                    <span className="ml-auto flex items-center gap-1">
-                      <Star size={12} className="fill-yellow-400 text-yellow-400" /> {event.rating}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
+      {upcoming.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold text-slate-900">Événements à venir</h2>
+          <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {upcoming.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
           </div>
-        )}
+        </section>
+      )}
 
-        {/* Événements passés */}
-        {pastEvents.length > 0 && (
-          <div className="mt-12">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-              <Calendar size={24} className="text-gray-400" /> Événements passés
-            </h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {pastEvents.map((event) => (
-                <Link
-                  key={event.id}
-                  href={`/events/${event.id}`}
-                  className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition p-5 opacity-75 hover:opacity-100 group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-gray-200 flex items-center justify-center text-2xl flex-shrink-0">
-                      🎫
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-gray-800 truncate">{event.title}</h3>
-                      <div className="flex items-center gap-1 text-xs text-gray-500">
-                        <MapPin size={12} /> {event.city}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-1 text-gray-600">
-                      <Calendar size={14} /> {event.date}
-                    </span>
-                    <span className="text-gray-400 line-through">{event.price}</span>
-                  </div>
-                  <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
-                    <Users size={12} /> {event.attendees} participants
-                    <span className="ml-auto flex items-center gap-1">
-                      <Star size={12} className="fill-yellow-400 text-yellow-400" /> {event.rating}
-                    </span>
-                  </div>
-                  <div className="mt-2 text-xs font-medium text-gray-400 bg-gray-100 rounded-full px-2 py-0.5 inline-block">
-                    Terminé
-                  </div>
-                </Link>
-              ))}
-            </div>
+      {past.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold text-slate-900">Événements passés</h2>
+          <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {past.map((event) => (
+              <EventCard key={event.id} event={event} muted />
+            ))}
           </div>
-        )}
+        </section>
+      )}
 
-        {events.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-400">Cet organisateur n&apos;a pas encore publié d&apos;événements.</p>
-          </div>
-        )}
-      </section>
+      {organizer.events.length === 0 && (
+        <section className="rounded-2xl border border-dashed border-slate-200 bg-white px-5 py-12 text-center">
+          <CalendarDays className="mx-auto size-7 text-slate-400" />
+          <p className="mt-3 text-sm font-semibold text-slate-700">Aucun événement publié</p>
+          <p className="mt-1 text-xs text-slate-500">
+            Les événements publiés par cette organisation apparaîtront ici.
+          </p>
+        </section>
+      )}
+    </DashboardShell>
+  );
+}
 
-      {/* ===== FOOTER ===== */}
-      <footer className="bg-gray-900 text-gray-300 py-12 border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-8">
-          <div>
-            <span className="text-2xl font-extrabold text-white flex items-center gap-2">
-              <CalendarDays size={24} className="text-[#0EA5E9]" /> Evenza
-            </span>
-            <p className="text-sm text-gray-400 mt-2">La plateforme événementielle pour organisateurs et participants.</p>
-            <p className="text-xs text-gray-500 mt-4">© 2026 Evenza. Tous droits réservés.</p>
-          </div>
-          <div>
-            <h5 className="font-semibold text-white">Découvrir</h5>
-            <ul className="mt-2 space-y-1 text-sm">
-              <li><Link href="/events" className="hover:text-white">Événements</Link></li>
-              <li><a href="#" className="hover:text-white">Catégories</a></li>
-              <li><a href="#" className="hover:text-white">Villes</a></li>
-            </ul>
-          </div>
-          <div>
-            <h5 className="font-semibold text-white">Organisateurs</h5>
-            <ul className="mt-2 space-y-1 text-sm">
-              <li><a href="#" className="hover:text-white">Créer un événement</a></li>
-              <li><a href="#" className="hover:text-white">Tarifs</a></li>
-              <li><a href="#" className="hover:text-white">Aide</a></li>
-            </ul>
-          </div>
-          <div>
-            <h5 className="font-semibold text-white">Légal</h5>
-            <ul className="mt-2 space-y-1 text-sm">
-              <li><a href="#" className="hover:text-white">Confidentialité</a></li>
-              <li><a href="#" className="hover:text-white">CGU</a></li>
-              <li><a href="#" className="hover:text-white">Cookies</a></li>
-            </ul>
-          </div>
+function EventCard({
+  event,
+  muted = false,
+}: {
+  event: {
+    id: string;
+    title: string;
+    city: string | null;
+    date: string | null;
+    price: number | null;
+    sold: number;
+    capacity: number;
+  };
+  muted?: boolean;
+}) {
+  const rate = event.capacity > 0 ? Math.min((event.sold / event.capacity) * 100, 100) : 0;
+
+  return (
+    <Link
+      href={`/events/${event.id}`}
+      className={`group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/50 transition hover:border-brand-200 hover:shadow-md ${
+        muted ? "opacity-80" : ""
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="font-semibold text-slate-900 group-hover:text-brand-700">{event.title}</h3>
+        <span className="whitespace-nowrap rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+          {event.price === null
+            ? "Gratuit / non défini"
+            : `${event.price.toLocaleString("fr-FR")} FCFA`}
+        </span>
+      </div>
+      <div className="mt-3 space-y-1.5 text-sm text-slate-500">
+        <p className="flex items-center gap-2">
+          <CalendarDays className="size-4" /> {formatDate(event.date)}
+        </p>
+        {event.city && (
+          <p className="flex items-center gap-2">
+            <MapPin className="size-4" /> {event.city}
+          </p>
+        )}
+      </div>
+      <div className="mt-4">
+        <div className="flex justify-between text-xs text-slate-500">
+          <span>
+            {event.sold} / {event.capacity} billets
+          </span>
+          <span>{Math.round(rate)} %</span>
         </div>
-      </footer>
-
-    </main>
+        <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100">
+          <div className="h-full rounded-full bg-brand-600" style={{ width: `${rate}%` }} />
+        </div>
+      </div>
+    </Link>
   );
 }

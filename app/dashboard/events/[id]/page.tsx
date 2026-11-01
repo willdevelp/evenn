@@ -168,17 +168,17 @@ export default function EventDetailPage() {
     {
       title: 'Ventes enregistrées',
       detail: `${event.total_sold} billets vendus au total`,
-      time: 'Aujourd’hui',
+      time: 'Cumul',
     },
     {
       title: 'Disponibilité',
       detail: `${Math.max(event.total_tickets - event.total_sold, 0)} places restantes`,
-      time: 'Mise à jour',
+      time: 'Stock',
     },
     {
       title: 'Revenus générés',
       detail: formatCurrency(event.revenue),
-      time: 'Récapitulatif',
+      time: 'Total',
     },
   ];
 
@@ -195,10 +195,10 @@ export default function EventDetailPage() {
             <ArrowLeft size={16} /> Retour
           </Link>
           <Link
-            href="#"
+            href={`/events/${event.id}`}
             className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-3 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-[#1d4ed8]"
           >
-            <ExternalLink size={16} /> Modifier
+            <ExternalLink size={16} /> Page publique
           </Link>
         </div>
       }
@@ -365,7 +365,7 @@ export default function EventDetailPage() {
               <p className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-400">Actions</p>
               <div className="mt-4 space-y-3">
                 <Link
-                  href="#"
+                  href="/dashboard/scan"
                   className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                 >
                   <span className="inline-flex items-center gap-2">
@@ -375,7 +375,7 @@ export default function EventDetailPage() {
                   <ExternalLink size={14} className="text-slate-400" />
                 </Link>
                 <Link
-                  href="#"
+                  href={`/dashboard/tickets?event=${event.id}`}
                   className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                 >
                   <span className="inline-flex items-center gap-2">

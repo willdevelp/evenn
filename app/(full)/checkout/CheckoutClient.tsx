@@ -174,7 +174,7 @@ export default function CheckoutClient({
             <div className="mt-6 grid gap-3 rounded-2xl border border-slate-200 p-4 text-sm sm:grid-cols-2">
               <p className="flex items-center gap-2 text-slate-600">
                 <User size={14} className="text-slate-400" />
-                {reservation.buyerName ?? "Client"}
+                {reservation.buyerName ?? "—"}
               </p>
               <p className="flex items-center gap-2 text-slate-600">
                 <Mail size={14} className="text-slate-400" />

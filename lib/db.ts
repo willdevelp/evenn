@@ -1,13 +1,14 @@
 import { Pool, type PoolClient } from "pg";
 
-// Un seul pool partagé (évite d'ouvrir trop de connexions en développement avec le hot reload)
+// Le pool distant en mode session a une limite globale basse ; chaque prerender worker
+// doit garder une seule connexion et la partager avec les requêtes concurrentes.
 const globalForPg = globalThis as unknown as { pgPool?: Pool };
 
 export const pool =
   globalForPg.pgPool ??
-  new Pool({ connectionString: process.env.DATABASE_URL, max: 10 });
+  new Pool({ connectionString: process.env.DATABASE_URL, max: 1 });
 
-if (process.env.NODE_ENV !== "production") globalForPg.pgPool = pool;
+globalForPg.pgPool = pool;
 
 /** Exécute fn dans une transaction : COMMIT si ça réussit, ROLLBACK si ça lève une erreur. */
 export async function withTransaction<T>(fn: (client: PoolClient) => Promise<T>): Promise<T> {

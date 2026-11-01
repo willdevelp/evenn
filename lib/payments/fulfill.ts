@@ -1,6 +1,7 @@
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
 import { makeTicketToken } from "../tickets";
+import { hashVoterPhone } from "../votes";
 
 type OrderRow = {
   id: string; organization_id: string; kind: "ticket" | "contribution" | "vote" | "subscription";
@@ -8,9 +9,6 @@ type OrderRow = {
   subtotal_amount: string; discount_amount: string; fee_amount: string;
   platform_commission_amount: string; total_amount: string;
 };
-
-const hashPhone = (phone: string) =>
-  createHash("sha256").update(`${process.env.VOTE_HASH_PEPPER ?? ""}${phone}`).digest("hex");
 
 /**
  * Finalise une commande payée. DOIT être appelée dans une transaction.
@@ -60,7 +58,7 @@ export async function fulfillPaidOrder(client: PoolClient, orderId: string, paym
         `INSERT INTO votes (contest_id, category_id, candidate_id, vote_purchase_id, source, quantity, voter_user_id, voter_phone_hash)
          VALUES ($1, $2, $3, $4, 'paid', $5, $6, $7)`,
         [p.contest_id, p.category_id, p.candidate_id, p.id, p.votes_count, order.buyer_user_id,
-         order.buyer_phone ? hashPhone(order.buyer_phone) : null],
+         order.buyer_phone ? hashVoterPhone(order.buyer_phone) : null],
       );
     }
   }

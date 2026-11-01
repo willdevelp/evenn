@@ -16,3 +16,8 @@ export { getPlans } from "@/lib/actions/plans/get-plans";
 export { createPlan } from "@/lib/actions/plans/create-plan";
 export { deletePlan } from "@/lib/actions/plans/delete-plan";
 export { updatePlan } from "@/lib/actions/plans/update-plan";
+export { getContestVotePage } from "@/lib/actions/votes/get-contest-vote-page";
+export { getContests } from "@/lib/actions/votes/get-contests";
+export { createVoteOrder } from "@/lib/actions/votes/create-vote-order";
+export { getVoteOrder } from "@/lib/actions/votes/get-vote-order";
+export { confirmMockVotePayment } from "@/lib/actions/votes/confirm-mock-payment";

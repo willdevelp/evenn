@@ -1,166 +1,152 @@
-"use client";
+import Link from "next/link";
+import { ArrowRight, Mail, MapPin, Phone } from "lucide-react";
 
-import { useState } from "react";
-import { FiMail, FiUser, FiMessageCircle, FiPhone, FiMapPin } from "react-icons/fi";
+import { Container } from "@/src/components/ui/container";
+import { getPublicSettings } from "@/lib/actions/settings/get-public-settings";
+import { cn } from "@/lib/utils";
+import ContactForm from "./ContactForm";
 
-export default function ContactPage() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [submitted, setSubmitted] = useState(false);
+export const dynamic = "force-dynamic";
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+export const metadata = {
+  title: "Contact | Masturi",
+  description:
+    "Une question sur Masturi ? Écrivez-nous : notre équipe vous répond dans les plus brefs délais.",
+};
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setTimeout(() => {
-      setSubmitted(true);
-      setForm({ name: "", email: "", message: "" });
-    }, 1000);
-  };
+export default async function ContactPage() {
+  const settings = await getPublicSettings();
+
+  const channels: {
+    icon: typeof Mail;
+    label: string;
+    content: React.ReactNode;
+  }[] = [];
+
+  if (settings.contactEmail) {
+    channels.push({
+      icon: Mail,
+      label: "Email",
+      content: (
+        <a
+          href={`mailto:${settings.contactEmail}`}
+          className="break-all font-semibold text-slate-900 transition hover:text-brand-600"
+        >
+          {settings.contactEmail}
+        </a>
+      ),
+    });
+  }
+
+  if (settings.contactPhone) {
+    channels.push({
+      icon: Phone,
+      label: "Téléphone",
+      content: (
+        <a
+          href={`tel:${settings.contactPhone.replace(/\s+/g, "")}`}
+          className="font-semibold text-slate-900 transition hover:text-brand-600"
+        >
+          {settings.contactPhone}
+        </a>
+      ),
+    });
+  }
+
+  if (settings.contactAddress) {
+    channels.push({
+      icon: MapPin,
+      label: "Adresse",
+      content: <p className="font-semibold text-slate-900">{settings.contactAddress}</p>,
+    });
+  }
 
   return (
-    <div className="min-h-[70vh] bg-slate-50 px-4 py-14 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl">
-        {/* En-tête */}
-        <div className="mb-12 text-center">
-          <span className="inline-flex rounded-full bg-blue-100 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-blue-700">À votre écoute</span>
-          <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">
-            Contactez-nous
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg">
-            Une question, une demande particulière ou juste un bonjour ? Nous sommes là pour vous répondre dans les plus brefs délais.
-          </p>
-        </div>
+    <main className="min-h-screen bg-surface pb-20 text-slate-700">
+      {/* ===== EN-TÊTE ===== */}
+      <section className="relative isolate overflow-hidden bg-brand-600 text-white">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)] bg-[size:40px_40px]"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-32 -top-40 size-[480px] rounded-full bg-brand-500/60 blur-3xl"
+        />
 
-        <div className="grid gap-6 md:grid-cols-3">
-          {/* Colonne gauche : infos de contact */}
-          <div className="md:col-span-1 space-y-6">
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-5 text-lg font-bold text-slate-900">Nos coordonnées</h2>
-              <ul className="space-y-5 text-sm text-slate-600">
-                <li className="flex items-start gap-3">
-                  <FiMail className="h-6 w-6 text-[#0EA5E9] flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-gray-800">Email</p>
-                    <a href="mailto:contact@evenn.com" className="hover:text-[#2563EB] transition">
-                      contact@evenn.com
-                    </a>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <FiPhone className="h-6 w-6 text-[#0EA5E9] flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-gray-800">Téléphone</p>
-                    <a href="tel:+33123456789" className="hover:text-[#2563EB] transition">
-                      +33 1 23 45 67 89
-                    </a>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <FiMapPin className="h-6 w-6 text-[#0EA5E9] flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-gray-800">Adresse</p>
-                    <p>10 rue de la Paix, 75002 Paris, France</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-
-            {/* Carte (mockup) */}
-            <div className="flex h-48 items-center justify-center rounded-3xl border border-blue-100 bg-gradient-to-br from-blue-50 to-sky-50 p-5 text-slate-500">
-              <div className="text-center">
-                <FiMapPin className="h-8 w-8 mx-auto text-[#0EA5E9]" />
-                <p className="mt-2 text-sm font-semibold text-slate-700">Un projet en tête ?</p>
-                <p className="mt-1 max-w-xs text-xs leading-5 text-slate-500">Décrivez-nous votre besoin dans le formulaire, notre équipe vous répondra.</p>
-              </div>
-            </div>
+        <Container className="relative pb-28 pt-14 sm:pb-32 sm:pt-20">
+          <div className="max-w-2xl motion-safe:animate-fade-up">
+            <h1 className="text-balance text-4xl font-bold leading-[1.06] tracking-tight sm:text-5xl lg:text-6xl">
+              Contactez-nous.
+            </h1>
+            <p className="mt-5 text-base leading-7 text-brand-50/90 sm:text-lg sm:leading-8">
+              Une question, une demande particulière ou juste un bonjour ? Nous sommes là pour
+              vous répondre dans les plus brefs délais.
+            </p>
           </div>
+        </Container>
+      </section>
 
-          {/* Colonne droite : formulaire */}
-          <div className="md:col-span-2">
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-9">
-              <h2 className="mb-6 text-2xl font-bold tracking-tight text-slate-950">Envoyez-nous un message</h2>
+      {/* ===== COORDONNÉES + FORMULAIRE ===== */}
+      <Container className="relative z-10 -mt-14 sm:-mt-16">
+        <div
+          className={cn(
+            "grid gap-6",
+            channels.length > 0 ? "md:grid-cols-[1fr_2fr]" : "mx-auto max-w-2xl",
+          )}
+        >
+          {/* Uniquement les canaux réellement configurés */}
+          {channels.length > 0 && (
+            <aside className="space-y-5 motion-safe:animate-fade-up [animation-delay:120ms]">
+              <section className="rounded-3xl border border-slate-200/80 bg-white shadow-card">
+                <h2 className="px-6 pb-4 pt-6 text-lg font-bold text-slate-950">
+                  Nos coordonnées
+                </h2>
+                <ul>
+                  {channels.map(({ icon: Icon, label, content }) => (
+                    <li
+                      key={label}
+                      className="flex items-start gap-3.5 border-t-2 border-dashed border-brand-200 px-6 py-5 text-sm"
+                    >
+                      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100">
+                        <Icon aria-hidden className="size-5" strokeWidth={1.75} />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-xs text-slate-500">{label}</p>
+                        <div className="mt-0.5 text-slate-600">{content}</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
 
-              {submitted ? (
-                <div className="bg-green-50 border border-green-200 text-green-800 p-6 rounded-xl text-center">
-                  <p className="text-lg font-medium">✅ Merci pour votre message !</p>
-                  <p className="mt-2 text-sm text-green-700">Nous vous répondrons dans les plus brefs délais.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                      Nom complet *
-                    </label>
-                    <div className="relative">
-                      <FiUser className="absolute left-3 top-3.5 text-gray-400" />
-                      <input
-                        type="text"
-                        name="name"
-                        id="name"
-                        required
-                        value={form.name}
-                        onChange={handleChange}
-                        placeholder="Votre nom"
-                        className="pl-10 pr-4 py-3 w-full border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-[#0EA5E9] focus:border-[#2563EB] text-sm transition"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                      Adresse email *
-                    </label>
-                    <div className="relative">
-                      <FiMail className="absolute left-3 top-3.5 text-[#0EA5E9]" />
-                      <input
-                        type="email"
-                        name="email"
-                        id="email"
-                        required
-                        value={form.email}
-                        onChange={handleChange}
-                        placeholder="votre@email.com"
-                        className="pl-10 pr-4 py-3 w-full border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-[#0EA5E9] focus:border-[#2563EB] text-sm transition"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                      Message *
-                    </label>
-                    <div className="relative">
-                      <FiMessageCircle className="absolute left-3 top-3.5 text-[#0EA5E9]" />
-                      <textarea
-                        name="message"
-                        id="message"
-                        rows={5}
-                        required
-                        value={form.message}
-                        onChange={handleChange}
-                        placeholder="Décrivez votre besoin ou votre question..."
-                        className="pl-10 pr-4 py-3 w-full border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-[#0EA5E9] focus:border-[#2563EB] text-sm resize-none transition"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full flex justify-center items-center gap-2 px-6 py-3 bg-[#2563EB] text-white font-semibold rounded-xl hover:bg-[#1D4ED8] shadow-lg shadow-[#2563EB]/25 hover:shadow-[#2563EB]/40 transition-all"
+              <section className="relative overflow-hidden rounded-3xl bg-brand-600 p-6 text-white">
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)] bg-[size:32px_32px]"
+                />
+                <div className="relative">
+                  <h2 className="text-base font-bold">Un projet en tête ?</h2>
+                  <p className="mt-2 text-sm leading-6 text-brand-50/90">
+                    Décrivez-nous votre besoin dans le formulaire, notre équipe vous répondra
+                    dans les meilleurs délais.
+                  </p>
+                  <Link
+                    href="/pricing"
+                    className="mt-5 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-brand-700 transition hover:-translate-y-0.5 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white/50"
                   >
-                    <FiMail className="h-5 w-5" />
-                    Envoyer le message
-                  </button>
-                </form>
-              )}
-            </div>
+                    Voir nos tarifs <ArrowRight aria-hidden className="size-4" />
+                  </Link>
+                </div>
+              </section>
+            </aside>
+          )}
+
+          <div className="motion-safe:animate-fade-up [animation-delay:200ms]">
+            <ContactForm />
           </div>
         </div>
-      </div>
-    </div>
+      </Container>
+    </main>
   );
 }
