@@ -26,6 +26,8 @@ export const metadata = {
     "Masturi connecte les organisateurs d’événements à leur public avec une billetterie en ligne, des QR Codes et un contrôle d’accès simple.",
 };
 
+export const dynamic = "force-dynamic";
+
 const STEPS = [
   {
     icon: Search,
