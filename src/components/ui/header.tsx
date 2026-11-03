@@ -81,33 +81,12 @@ export default function Header() {
 
         {/* Actions desktop */}
         <div className="hidden items-center gap-3 md:flex">
-          {isPending ? (
-            <span aria-hidden className="h-9 w-28 animate-pulse rounded-lg bg-slate-100" />
-          ) : session ? (
-            <>
-              <Link
-                href="/dashboard"
-                className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:text-slate-950 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-600/20"
-              >
-                Mon espace
-              </Link>
-              <button
-                type="button"
-                onClick={handleSignOut}
-                aria-label="Se déconnecter"
-                className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-50 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-600/20"
-              >
-                <LogOut className="size-4" />
-              </button>
-            </>
-          ) : (
             <Link
               href="/auth/login"
               className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:text-slate-950 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-600/20"
             >
               Connexion
             </Link>
-          )}
 
           <Link
             href={session ? '/dashboard/events/create' : '/auth/register'}
@@ -157,15 +136,7 @@ export default function Header() {
             ))}
           </ul>
           <div className="mt-3 space-y-2 border-t border-slate-100 pt-3">
-            {isPending ? null : session ? (
-              <Link
-                href="/dashboard"
-                onClick={closeMenu}
-                className="block rounded-lg bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
-              >
-                Mon espace
-              </Link>
-            ) : (
+
               <Link
                 href="/auth/login"
                 onClick={closeMenu}
@@ -173,13 +144,12 @@ export default function Header() {
               >
                 Connexion
               </Link>
-            )}
             <Link
-              href={session ? '/dashboard/events/create' : '/auth/register'}
+              href={'/auth/register'}
               onClick={closeMenu}
               className="block rounded-xl bg-brand-600 px-3 py-3 text-center text-sm font-semibold text-white transition hover:bg-brand-700"
             >
-              {session ? 'Créer un événement' : 'Créer mon événement'}
+Créer un événement
             </Link>
           </div>
         </nav>

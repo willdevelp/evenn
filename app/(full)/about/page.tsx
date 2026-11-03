@@ -17,6 +17,9 @@ import { getPlatformStats } from "@/lib/actions/stats/get-platform-stats";
 import { cn } from "@/lib/utils";
 import FaqItem from "./faq-item";
 
+import Header from "@/src/components/ui/header";
+import Footer from "@/src/components/ui/footer";
+
 export const metadata = {
   title: "À propos | Masturi",
   description:
@@ -93,6 +96,8 @@ export default async function AboutPage() {
   ];
 
   return (
+    <>
+    <Header />
     <main className="bg-surface text-slate-700">
       {/* ===== EN-TÊTE ===== */}
       <section className="relative isolate overflow-hidden bg-brand-600 text-white">
@@ -317,6 +322,8 @@ export default async function AboutPage() {
         </section>
       </Container>
     </main>
+    <Footer />
+    </>
   );
 }
 

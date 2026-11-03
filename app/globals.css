@@ -198,3 +198,130 @@
     }
   }
 }
+
+
+/*
+  À coller à la fin de votre globals.css.
+  Tout est désactivé automatiquement si l'utilisateur a demandé
+  « réduire les animations » dans son système.
+*/
+
+@media (prefers-reduced-motion: no-preference) {
+  /* ---- Apparition au scroll (composant <Reveal>) ---- */
+  .m-reveal {
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--d, 0ms);
+  }
+  .m-reveal[data-reveal="hidden"] {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  /* ---- Barres du graphique : elles « poussent » quand le bloc apparaît ---- */
+  .m-bar {
+    transform-origin: bottom;
+    transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(var(--d, 0ms) + 250ms + var(--i, 0) * 70ms);
+  }
+  .m-reveal[data-reveal="hidden"] .m-bar {
+    transform: scaleY(0);
+  }
+
+  /* ---- Entrée au chargement (hero) ---- */
+  .m-rise {
+    animation: m-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--d, 0ms);
+  }
+  @keyframes m-rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ---- Cartes flottantes ---- */
+  .m-float {
+    animation: m-float 6s ease-in-out infinite;
+    animation-delay: var(--d, 0ms);
+  }
+  @keyframes m-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  /* ---- Halos d'arrière-plan qui dérivent lentement ---- */
+  .m-drift {
+    animation: m-drift 16s ease-in-out infinite alternate;
+  }
+  @keyframes m-drift {
+    to {
+      transform: translate3d(40px, 30px, 0) scale(1.08);
+    }
+  }
+
+  /* ---- Barre de remplissage (largeur finale = --w) ---- */
+  .m-fill {
+    animation: m-fill 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both;
+  }
+  @keyframes m-fill {
+    from {
+      width: 0;
+    }
+    to {
+      width: var(--w);
+    }
+  }
+
+  /* ---- Ligne de scan sur le QR code du téléphone ---- */
+  .m-scan {
+    animation: m-scan 2.4s ease-in-out infinite;
+  }
+  @keyframes m-scan {
+    0% {
+      top: 12%;
+      opacity: 0;
+    }
+    15%,
+    85% {
+      opacity: 1;
+    }
+    100% {
+      top: 88%;
+      opacity: 0;
+    }
+  }
+
+  /* ---- Petit « pop » de la validation ---- */
+  .m-pop {
+    animation: m-pop 3.6s ease-in-out infinite;
+  }
+  @keyframes m-pop {
+    0%,
+    60%,
+    100% {
+      transform: scale(1);
+    }
+    70% {
+      transform: scale(1.06);
+    }
+    80% {
+      transform: scale(1);
+    }
+  }
+
+  /* ---- Ouverture d'une question de la FAQ ---- */
+  .m-open {
+    animation: m-rise 0.35s ease-out both;
+  }
+}

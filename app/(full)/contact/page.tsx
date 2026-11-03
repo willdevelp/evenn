@@ -6,6 +6,9 @@ import { getPublicSettings } from "@/lib/actions/settings/get-public-settings";
 import { cn } from "@/lib/utils";
 import ContactForm from "./ContactForm";
 
+import Header from "@/src/components/ui/header";
+import Footer from "@/src/components/ui/footer";
+
 export const dynamic = "force-dynamic";
 
 export const metadata = {
@@ -62,6 +65,8 @@ export default async function ContactPage() {
   }
 
   return (
+    <>
+    <Header />
     <main className="min-h-screen bg-surface pb-20 text-slate-700">
       {/* ===== EN-TÊTE ===== */}
       <section className="relative isolate overflow-hidden bg-brand-600 text-white">
@@ -148,5 +153,7 @@ export default async function ContactPage() {
         </div>
       </Container>
     </main>
+    <Footer />
+    </>
   );
 }

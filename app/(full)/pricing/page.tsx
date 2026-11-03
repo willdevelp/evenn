@@ -16,6 +16,9 @@ import { getPublicSettings } from "@/lib/actions/settings/get-public-settings";
 import PricingCalculator from "./pricing-calculator";
 import PricingFaqList, { type PricingFaq } from "./pricing-faq";
 
+import Header from "@/src/components/ui/header";
+import Footer from "@/src/components/ui/footer";
+
 export const dynamic = "force-dynamic";
 
 export const metadata = {
@@ -107,6 +110,8 @@ export default async function PricingPage() {
   ];
 
   return (
+    <>
+    <Header />
     <div className="bg-surface">
       {/* En-tête */}
       <section className="relative overflow-hidden border-b border-slate-200/70">
@@ -288,6 +293,8 @@ export default async function PricingPage() {
         </section>
       </Container>
     </div>
+    <Footer />
+    </>
   );
 }
 
