@@ -45,6 +45,8 @@ import { cn } from "@/lib/utils";
 import Header from "@/src/components/ui/header";
 import Footer from "@/src/components/ui/footer";
 
+export const dynamic = "force-dynamic";
+
 /* Délai d'animation (ms) passé en variable CSS */
 const d = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
 
