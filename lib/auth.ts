@@ -66,11 +66,11 @@ export const auth = betterAuth({
         input: false,
         fieldName: "lastLoginAt",
       },
-      deletedAt: {
+      deleted_at: {
         type: "date",
         required: false,
         input: false,
-        fieldName: "deletedAt",
+        fieldName: "deleted_at",
       },
     },
   },

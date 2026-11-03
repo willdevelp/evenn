@@ -26,7 +26,7 @@ mappé explicitement :
 
 ```
 user          : emailVerified, createdAt, updatedAt, countryCode, locale,
-                lastLoginAt, deletedAt, phoneNumber (plugin), role/banned (plugin admin)
+                lastLoginAt, deleted_at, phoneNumber (plugin), role/banned (plugin admin)
 session       : expiresAt, createdAt, updatedAt, ipAddress, userAgent, userId, impersonatedBy
 account       : accountId, providerId, userId, accessToken, refreshToken, idToken,
                 accessTokenExpiresAt*, refreshTokenExpiresAt*, scope, createdAt, updatedAt
