@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { admin, phoneNumber } from "better-auth/plugins";
 import { pool } from "./db";
+import { normalizeAuthUrl } from "./auth-url";
 
 /**
  * Mappage explicite des colonnes.
@@ -14,7 +15,7 @@ import { pool } from "./db";
  */
 export const auth = betterAuth({
   database: pool,
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: normalizeAuthUrl(process.env.BETTER_AUTH_URL),
   secret: process.env.BETTER_AUTH_SECRET,
 
   // Les IDs sont des UUID (colonnes uuid du schéma SQL)
