@@ -3,3 +3,4 @@
 
 [build.environment]
   SECRETS_SCAN_OMIT_PATHS = ".netlify/.next/cache/**,.netlify/.next/server/**,.netlify/.next/standalone/**,.netlify/functions-internal/**,.netlify/edge-functions/**"
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,BETTER_AUTH_URL"
