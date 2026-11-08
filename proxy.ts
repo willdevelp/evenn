@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const DEFAULT_BASE_URL = "http://localhost:3000";
+const DEFAULT_BASE_URL = "http://masturi.netlify.app"; // fallback pour le développement local, si NEXT_PUBLIC_BASE_URL n'est pas défini
 
 const PLATFORM_HOSTS = [
   ".vercel.app",
