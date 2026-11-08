@@ -148,6 +148,7 @@ export type TicketQrData = {
   id: string;
   code: string;
   event: string;
+  logoUrl: string | null;
   ticketType: string;
   price: number;
   holderName: string;
@@ -672,7 +673,7 @@ export async function getTicketForQr(ticketId: string): Promise<TicketQrData | n
 
   const { rows } = await pool.query(
     `SELECT t.id, t.qr_token, t.holder_name, t.holder_email,
-            e.title AS event_title,
+            e.title AS event_title, e.logo_url AS event_logo_url,
             tt.name AS ticket_type, tt.price_amount,
             o.order_number
        FROM tickets t
@@ -691,6 +692,7 @@ export async function getTicketForQr(ticketId: string): Promise<TicketQrData | n
     id: ticket.id,
     code: ticket.qr_token,
     event: ticket.event_title,
+    logoUrl: ticket.event_logo_url,
     ticketType: ticket.ticket_type,
     price: Number(ticket.price_amount),
     holderName: ticket.holder_name ?? "—",

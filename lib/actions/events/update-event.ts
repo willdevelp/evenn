@@ -32,18 +32,19 @@ export async function updateEvent(id: string, input: unknown) {
     const { rows: events } = await client.query(
       `UPDATE events
           SET title = $1, description = $2, category_id = $3, cover_url = $4,
-              venue_name = $5, address = $6, city = $7, country_code = $8,
-              timezone = $9, status = $10, visibility = $11,
-              published_at = CASE WHEN $10 = 'published' AND published_at IS NULL
-                                  THEN $12::timestamptz ELSE published_at END,
+              logo_url = $5, venue_name = $6, address = $7, city = $8, country_code = $9,
+              timezone = $10, status = $11, visibility = $12,
+              published_at = CASE WHEN $11 = 'published' AND published_at IS NULL
+                                  THEN $13::timestamptz ELSE published_at END,
               updated_at = now()
-        WHERE id = $13
+        WHERE id = $14
         RETURNING id, slug, title, status`,
       [
         data.title,
         data.description,
         data.category_id ?? null,
         data.cover_url || null,
+        data.logo_url || null,
         data.venue_name || null,
         data.address,
         data.city,
@@ -77,27 +78,29 @@ export async function updateEvent(id: string, input: unknown) {
       );
     }
 
-    // On désactive les anciennes catégories de billets (l'historique reste intact).
-    await client.query(`UPDATE ticket_types SET is_active = false WHERE event_id = $1`, [id]);
+    if (data.tickets) {
+      // On désactive les anciennes catégories de billets (l'historique reste intact).
+      await client.query(`UPDATE ticket_types SET is_active = false WHERE event_id = $1`, [id]);
 
-    for (const [index, ticket] of data.tickets.entries()) {
-      await client.query(
-        `INSERT INTO ticket_types (
-           event_id, name, description, price_amount, currency,
-           quantity_total, max_per_order, is_active, sort_order
-         )
-         VALUES ($1, $2, $3, $4, $5, $6, $7, true, $8)`,
-        [
-          id,
-          ticket.name,
-          ticket.description || null,
-          Math.round(ticket.price_amount),
-          ticket.currency ?? "XAF",
-          ticket.quantity_total,
-          ticket.max_per_order ?? 10,
-          index,
-        ],
-      );
+      for (const [index, ticket] of data.tickets.entries()) {
+        await client.query(
+          `INSERT INTO ticket_types (
+             event_id, name, description, price_amount, currency,
+             quantity_total, max_per_order, is_active, sort_order
+           )
+           VALUES ($1, $2, $3, $4, $5, $6, $7, true, $8)`,
+          [
+            id,
+            ticket.name,
+            ticket.description || null,
+            Math.round(ticket.price_amount),
+            ticket.currency ?? "XAF",
+            ticket.quantity_total,
+            ticket.max_per_order ?? 10,
+            index,
+          ],
+        );
+      }
     }
 
     revalidatePath("/events");

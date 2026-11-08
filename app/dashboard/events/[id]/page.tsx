@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import DashboardShell from '@/src/components/dashboard/DashboardShell';
 import { getEventById, type EventDetail } from '@/lib/actions/events/get-event-by-id';
+import { resolveSiteEventType } from '@/lib/sites/catalog';
 import {
   ArrowLeft,
   BadgeCheck,
@@ -13,6 +14,7 @@ import {
   Clock3,
   DollarSign,
   ExternalLink,
+  Globe2,
   Image as ImageIcon,
   MapPin,
   Ticket,
@@ -136,6 +138,7 @@ export default function EventDetailPage() {
   const statusStyles = getStatusStyles(event.status);
   const eventLocation = event.location || event.venue_name || event.city || 'Lieu à préciser';
   const soldRate = event.total_tickets > 0 ? Math.round((event.total_sold / event.total_tickets) * 100) : 0;
+  const supportsSite = resolveSiteEventType(event.category) !== null;
 
   const stats = [
     {
@@ -194,6 +197,14 @@ export default function EventDetailPage() {
           >
             <ArrowLeft size={16} /> Retour
           </Link>
+          {supportsSite ? (
+            <Link
+              href={`/dashboard/events/${event.id}/site`}
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+            >
+              <Globe2 size={16} /> Site web
+            </Link>
+          ) : null}
           <Link
             href={`/events/${event.id}`}
             className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-3 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-[#1d4ed8]"
@@ -364,6 +375,17 @@ export default function EventDetailPage() {
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <p className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-400">Actions</p>
               <div className="mt-4 space-y-3">
+                {supportsSite ? (
+                  <Link
+                    href={`/dashboard/events/${event.id}/site`}
+                    className="flex items-center justify-between rounded-xl border border-blue-100 bg-blue-50 px-3 py-2.5 text-sm font-medium text-[#2563EB] transition hover:bg-blue-100"
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <Globe2 size={16} /> Créer / gérer le site web
+                    </span>
+                    <ExternalLink size={14} className="text-[#2563EB]/60" />
+                  </Link>
+                ) : null}
                 <Link
                   href="/dashboard/scan"
                   className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"

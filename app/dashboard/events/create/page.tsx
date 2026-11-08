@@ -347,6 +347,7 @@ export default function CreateEventPage() {
   const [address, setAddress] = useState("");
   const [venueName, setVenueName] = useState("");
   const [image, setImage] = useState<File | null>(null);
+  const [logo, setLogo] = useState<File | null>(null);
   const [publishNow, setPublishNow] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -361,10 +362,7 @@ export default function CreateEventPage() {
   }, []);
 
   // Gestion des billets
-  const [tickets, setTickets] = useState<Ticket[]>([
-    { name: "VIP", price: 50000, quantity: 100 },
-    { name: "Standard", price: 10000, quantity: 200 },
-  ]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
 
   const addTicket = () => {
     setTickets([...tickets, { name: "", price: 0, quantity: 0 }]);
@@ -384,8 +382,8 @@ export default function CreateEventPage() {
     e.preventDefault();
     setLoading(true);
 
-    if (tickets.length === 0 || tickets.some((ticket) => !ticket.name.trim() || ticket.price < 0 || ticket.quantity <= 0)) {
-      toast.error("Ajoutez au moins un billet valide.");
+    if (tickets.some((ticket) => !ticket.name.trim() || ticket.price < 0 || ticket.quantity <= 0)) {
+      toast.error("Vérifiez les informations des billets ajoutés.");
       setLoading(false);
       return;
     }
@@ -400,10 +398,11 @@ export default function CreateEventPage() {
     const endsAt = endTime ? toDoualaISO(date, endTime) : "";
 
     let uploadedImageUrl = "";
+    let uploadedLogoUrl = "";
     try {
-      if (image) {
+      const uploadImage = async (file: File) => {
         const data = new FormData();
-        data.append("file", image);
+        data.append("file", file);
         data.append("upload_preset", "evenn_upload");
         const uploadResponse = await fetch(
           `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
@@ -413,8 +412,18 @@ export default function CreateEventPage() {
         if (!uploadResponse.ok) {
           throw new Error("Échec du téléchargement de l’image");
         }
-        const uploadData = await uploadResponse.json();
-        uploadedImageUrl = uploadData.secure_url ?? '';
+        const uploadData: { secure_url?: string } = await uploadResponse.json();
+        if (!uploadData.secure_url) {
+          throw new Error("Le service d’image n’a pas retourné d’URL.");
+        }
+        return uploadData.secure_url;
+      };
+
+      if (image) {
+        uploadedImageUrl = await uploadImage(image);
+      }
+      if (logo) {
+        uploadedLogoUrl = await uploadImage(logo);
       }
 
       await createEvent({
@@ -422,6 +431,7 @@ export default function CreateEventPage() {
         description,
         category_id: categoryId || null,
         cover_url: uploadedImageUrl,
+        logo_url: uploadedLogoUrl,
         venue_name: venueName,
         address,
         city,
@@ -552,6 +562,31 @@ export default function CreateEventPage() {
                   </button>
                 )}
               </div>
+
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                  Logo de l&apos;événement <span className="font-normal text-slate-400">(optionnel, affiché au centre du QR code)</span>
+                </label>
+                <div className="relative">
+                  <input
+                    id="event-logo"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setLogo(e.target.files?.[0] ?? null)}
+                    className="peer absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+                  />
+                  <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/70 px-4 py-6 text-center transition peer-hover:border-[#2563EB] peer-focus-visible:border-[#2563EB] peer-focus-visible:ring-4 peer-focus-visible:ring-[#2563EB]/10">
+                    <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-white text-[#2563EB] shadow-sm"><ImageIcon className="h-5 w-5" /></span>
+                    <p className="mt-3 text-sm font-medium text-slate-700">{logo ? logo.name : "Choisir le logo de l’événement"}</p>
+                    <p className="mt-1 text-xs text-slate-500">Sans logo, le QR code reste généré normalement.</p>
+                  </div>
+                </div>
+                {logo && (
+                  <button type="button" onClick={() => setLogo(null)} className="mt-2 text-xs font-medium text-red-600 hover:text-red-700">
+                    Retirer le logo
+                  </button>
+                )}
+              </div>
             </section>
 
             <section className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/50 sm:p-7">
@@ -612,7 +647,7 @@ export default function CreateEventPage() {
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700"><Ticket className="h-5 w-5" /></span>
                   <div>
                     <h3 className="font-semibold text-slate-900">Billetterie</h3>
-                    <p className="mt-1 text-sm text-slate-500">Créez une ou plusieurs catégories de billets.</p>
+                    <p className="mt-1 text-sm text-slate-500">La billetterie est facultative. Vous pourrez proposer des billets ou laisser l’événement sans réservation.</p>
                   </div>
                 </div>
                 <button type="button" onClick={addTicket} className="inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-sm font-semibold text-[#2563EB] transition hover:bg-blue-100">
@@ -625,7 +660,7 @@ export default function CreateEventPage() {
                   <div key={index} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 sm:p-5">
                     <div className="mb-4 flex items-center justify-between">
                       <p className="text-sm font-semibold text-slate-700">Catégorie {index + 1}</p>
-                      <button type="button" onClick={() => removeTicket(index)} disabled={tickets.length === 1} aria-label={`Supprimer la catégorie ${index + 1}`} className="rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
+                      <button type="button" onClick={() => removeTicket(index)} aria-label={`Supprimer la catégorie ${index + 1}`} className="rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-600">
                         <X className="h-4 w-4" />
                       </button>
                     </div>
@@ -645,6 +680,11 @@ export default function CreateEventPage() {
                     </div>
                   </div>
                 ))}
+                {tickets.length === 0 && (
+                  <p className="rounded-xl border border-dashed border-slate-200 p-5 text-center text-sm text-slate-500">
+                    Aucun billet ajouté. Vous pouvez créer l’événement sans billetterie.
+                  </p>
+                )}
               </div>
             </section>
           </div>

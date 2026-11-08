@@ -1,6 +1,7 @@
 import { getEvent } from "@/lib/actions/events/get-events";
 import EventsClient from "./EventsClient";
 import type { EventListItem } from "@/src/components/events/event-card";
+import Footer from "@/src/components/ui/footer";
 
 export const dynamic = "force-dynamic";
 
@@ -29,5 +30,10 @@ export default async function EventsPage() {
       ticketsSold: event.tickets_sold,
     }));
 
-  return <EventsClient events={events} />;
+  return (
+    <>
+      <EventsClient events={events} />
+      <Footer />
+    </>
+  );
 }

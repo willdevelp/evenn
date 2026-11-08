@@ -9,6 +9,7 @@ import {
   Users,
   BarChart3,
   DollarSign,
+  Globe2,
   Settings,
   LogOut,
   ChevronLeft,
@@ -21,6 +22,7 @@ import { toast } from "sonner";
 const navItems = [
   { name: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
   { name: "Mes événements", href: "/dashboard/events", icon: CalendarDays },
+  { name: "Sites web", href: "/dashboard/sites", icon: Globe2 },
   { name: "Tickets", href: "/dashboard/tickets", icon: Ticket },
   { name: "Réservations", href: "/dashboard/reservations", icon: Users },
   { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },

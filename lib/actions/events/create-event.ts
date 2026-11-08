@@ -43,11 +43,11 @@ export async function createEvent(input: unknown): Promise<CreatedEvent> {
 
     const { rows: events } = await client.query<CreatedEvent>(
       `INSERT INTO events (
-         organization_id, category_id, title, slug, description, cover_url,
+        organization_id, category_id, title, slug, description, cover_url, logo_url,
          venue_name, address, city, country_code, timezone,
          status, visibility, published_at
        )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
        RETURNING id, slug, title, status`,
       [
         organization.id,
@@ -56,6 +56,7 @@ export async function createEvent(input: unknown): Promise<CreatedEvent> {
         slug,
         data.description,
         data.cover_url || null,
+        data.logo_url || null,
         data.venue_name || null,
         data.address,
         data.city,
@@ -80,7 +81,7 @@ export async function createEvent(input: unknown): Promise<CreatedEvent> {
       ],
     );
 
-    for (const [index, ticket] of data.tickets.entries()) {
+    for (const [index, ticket] of (data.tickets ?? []).entries()) {
       await client.query(
         `INSERT INTO ticket_types (
            event_id, name, description, price_amount, currency,

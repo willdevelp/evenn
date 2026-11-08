@@ -19,7 +19,6 @@ import EventCard, { type EventListItem } from "@/src/components/events/event-car
 import { cn } from "@/lib/utils";
 
 import Header from "@/src/components/ui/header";
-import Footer from "@/src/components/ui/footer";
 
 const selectClass =
   "w-full cursor-pointer appearance-none border-0 bg-transparent py-3.5 pl-0 pr-7 text-sm font-medium text-slate-700 outline-none focus:ring-0 bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 fill=%22none%22 stroke=%22%2364748b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m4 6 4 4 4-4%22/></svg>')] bg-[length:16px] bg-[right_0.25rem_center] bg-no-repeat";
@@ -377,7 +376,6 @@ export default function EventsClient({ events }: { events: EventListItem[] }) {
         </section>
       </Container>
     </main>
-    <Footer />
     </>
   );
 }

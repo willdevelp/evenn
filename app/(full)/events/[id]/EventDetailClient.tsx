@@ -496,7 +496,7 @@ export default function EventDetailClient({
                       <span className="text-lg font-bold text-brand-100">FCFA</span>
                     </>
                   ) : (
-                    "Complet"
+                    event.tickets.length === 0 ? "Aucune billetterie" : "Complet"
                   )}
                 </p>
                 <div className="mt-4 flex items-center gap-4 text-sm text-brand-50">
@@ -520,6 +520,11 @@ export default function EventDetailClient({
                 <Ticket size={18} className="text-brand-600" /> Billets
               </h2>
               <div className="space-y-2.5">
+                {event.tickets.length === 0 && (
+                  <p className="rounded-2xl border border-dashed border-slate-200 p-4 text-sm text-slate-500">
+                    Cet événement n’a pas de billets à réserver.
+                  </p>
+                )}
                 {event.tickets.map((ticket) => (
                   <div
                     key={ticket.id}
@@ -557,7 +562,11 @@ export default function EventDetailClient({
                 disabled={!hasAvailableTickets}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 py-4 font-semibold text-white shadow-sm transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-600/30 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
               >
-                {hasAvailableTickets ? "Réserver mon billet" : "Billets épuisés"}
+                {hasAvailableTickets
+                  ? "Réserver mon billet"
+                  : event.tickets.length === 0
+                    ? "Aucun billet à réserver"
+                    : "Billets épuisés"}
                 {hasAvailableTickets && <ArrowRight size={18} />}
               </button>
 

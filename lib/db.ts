@@ -1,3 +1,6 @@
+
+
+
 import { Pool, type PoolClient } from "pg";
 
 // Le pool distant en mode session a une limite globale basse ; chaque prerender worker

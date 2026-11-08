@@ -3,7 +3,7 @@ import { z } from "zod";
 /**
  * Validation de la création d'un événement, alignée sur le schéma SQL réel :
  *   - `events`       : organization_id (NOT NULL), title, slug, category_id,
- *                      description, cover_url, venue_name, address, city,
+ *                      description, cover_url, logo_url, venue_name, address, city,
  *                      country_code, timezone, visibility, status
  *   - `event_dates`  : event_id, starts_at (NOT NULL), doors_open_at, ends_at
  *   - `ticket_types` : event_id, name, price_amount, currency, quantity_total,
@@ -48,6 +48,7 @@ export const eventInputSchema = z
     description: trimmed("Description", 10, 5000),
     category_id: z.string().uuid("Catégorie invalide").nullable().optional(),
     cover_url: z.string().url("URL d'image invalide").or(z.literal("")).optional(),
+    logo_url: z.string().url("URL du logo invalide").or(z.literal("")).optional(),
     venue_name: z.string().trim().max(160).optional().or(z.literal("")),
     address: trimmed("Adresse", 3, 255),
     city: trimmed("Ville", 2, 80),
@@ -63,7 +64,7 @@ export const eventInputSchema = z
     status: z.enum(["draft", "published"]).optional(),
     visibility: z.enum(["public", "unlisted", "private"]).optional(),
 
-    tickets: z.array(ticketTypeInputSchema).min(1, "Au moins un billet est requis"),
+    tickets: z.array(ticketTypeInputSchema).optional(),
   })
   .refine((data) => !data.ends_at || Date.parse(data.ends_at) > Date.parse(data.starts_at), {
     message: "La fin doit être postérieure au début.",

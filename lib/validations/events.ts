@@ -14,6 +14,7 @@ export const EventsInsertSchema = z.object({
   "is_featured": z.boolean().optional(),
   "latitude": z.number().nullable().optional(),
   "longitude": z.number().nullable().optional(),
+  "logo_url": z.string().nullable().optional(),
   "organization_id": z.string(),
   "published_at": z.string().nullable().optional(),
   "refund_policy": z.string().nullable().optional(),
@@ -39,6 +40,7 @@ export const EventsUpdateSchema = z.object({
   "is_featured": z.boolean().optional(),
   "latitude": z.number().nullable().optional(),
   "longitude": z.number().nullable().optional(),
+  "logo_url": z.string().nullable().optional(),
   "organization_id": z.string().optional(),
   "published_at": z.string().nullable().optional(),
   "refund_policy": z.string().nullable().optional(),
@@ -50,4 +52,3 @@ export const EventsUpdateSchema = z.object({
   "venue_name": z.string().nullable().optional(),
   "visibility": VisibilityLevelSchema.optional(),
 }).strict();
-

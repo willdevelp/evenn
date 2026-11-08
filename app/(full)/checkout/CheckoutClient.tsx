@@ -192,6 +192,7 @@ export default function CheckoutClient({
               <TicketCodes
                 tickets={reservation.tickets}
                 eventTitle={reservation.eventTitle}
+                logoUrl={reservation.eventLogoUrl}
               />
             ) : (
               <div className="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-800">

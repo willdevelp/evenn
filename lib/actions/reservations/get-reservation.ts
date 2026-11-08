@@ -25,6 +25,7 @@ export type ReservationDetail = {
   status: string;
   eventId: string;
   eventTitle: string;
+  eventLogoUrl: string | null;
   eventDate: string | null;
   venue: string;
   city: string;
@@ -50,6 +51,7 @@ type OrderRow = {
   created_at: Date;
   event_id: string | null;
   event_title: string | null;
+  event_logo_url: string | null;
   venue: string | null;
   city: string | null;
   starts_at: Date | null;
@@ -74,6 +76,7 @@ export async function getReservation(orderId: string): Promise<ReservationDetail
         o.created_at,
         e.id            AS event_id,
         e.title         AS event_title,
+        e.logo_url      AS event_logo_url,
         CONCAT_WS(', ', NULLIF(e.venue_name, ''), NULLIF(e.city, '')) AS venue,
         e.city,
         d.starts_at
@@ -133,6 +136,7 @@ export async function getReservation(orderId: string): Promise<ReservationDetail
     status: order.status,
     eventId: order.event_id ?? "",
     eventTitle: order.event_title ?? "Événement",
+    eventLogoUrl: order.event_logo_url,
     eventDate: order.starts_at ? order.starts_at.toISOString() : null,
     venue: order.venue ?? "",
     city: order.city ?? "",

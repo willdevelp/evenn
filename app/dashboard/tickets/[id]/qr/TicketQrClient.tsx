@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
-import QRCode from "react-qr-code";
+import { QRCodeCanvas } from "qrcode.react";
 import { ArrowLeft, Download, Printer, Ticket } from "lucide-react";
 import { toast } from "sonner";
 
@@ -16,34 +16,21 @@ export default function TicketQrClient({ ticket }: { ticket: TicketQrData }) {
   const formatPrice = () => `${ticket.price.toLocaleString("fr-FR")} ${ticket.currency}`;
 
   const downloadQR = () => {
-    const svg = qrRef.current?.querySelector("svg");
-    if (!svg) {
+    const canvas = qrRef.current?.querySelector("canvas");
+    if (!canvas) {
       toast.error("Impossible de générer le QR code.");
       return;
     }
 
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    if (!context) {
-      toast.error("Impossible de générer le QR code.");
-      return;
-    }
-
-    const svgData = new XMLSerializer().serializeToString(svg);
-    const image = new Image();
-    image.onload = () => {
-      canvas.width = 600;
-      canvas.height = 600;
-      context.fillStyle = "#FFFFFF";
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    try {
       const link = document.createElement("a");
       link.download = `billet-${ticket.code}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
       toast.success("QR code téléchargé.");
-    };
-    image.src = `data:image/svg+xml;base64,${btoa(svgData)}`;
+    } catch {
+      toast.error("Impossible de générer le QR code.");
+    }
   };
 
   return (
@@ -103,12 +90,25 @@ export default function TicketQrClient({ ticket }: { ticket: TicketQrData }) {
 
           <div className="flex flex-col items-center justify-center border-t border-slate-100 py-6">
             <div ref={qrRef} className="rounded-xl border border-slate-200 bg-white p-4 shadow-lg">
-              <QRCode
+              <QRCodeCanvas
                 value={ticket.code}
-                size={220}
+                size={600}
                 level="H"
                 fgColor="#0F172A"
                 bgColor="#FFFFFF"
+                marginSize={4}
+                style={{ width: 220, height: 220 }}
+                imageSettings={
+                  ticket.logoUrl
+                    ? {
+                        src: ticket.logoUrl,
+                        width: 120,
+                        height: 120,
+                        excavate: true,
+                        crossOrigin: "anonymous",
+                      }
+                    : undefined
+                }
               />
             </div>
             <p className="mt-4 break-all text-center font-mono text-xs text-slate-400">
