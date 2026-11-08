@@ -46,6 +46,21 @@ GOOGLE_CLIENT_ID=...
 GOOGLE_CLIENT_SECRET=...
 ```
 
+Sur Netlify, configurez les identifiants privés dans les variables
+d'environnement du projet. Les fichiers `.env*` sont ignorés par Git.
+`BETTER_AUTH_SECRET` et les clés API doivent rester côté serveur ; ne les
+préfixez jamais par `NEXT_PUBLIC_`.
+
+L'analyse des secrets reste activée dans `netlify.toml`, y compris pour les
+fonctions générées. Seules les variables publiques explicitement listées sont
+exclues, notamment `BETTER_AUTH_URL`, qui est une URL publique sans identifiants.
+La liste des variables dans la configuration résolue du journal Netlify ne
+prouve pas qu'elles ont toutes été exposées. Pour diagnostiquer un échec,
+consultez les détections qui précèdent le message final : elles indiquent la
+variable et le fichier concernés, sans partager leurs valeurs. Si une clé
+privée a été exposée, remplacez-la dans Netlify et retirez sa valeur du fichier
+signalé ; n'ajoutez pas d'exclusion pour cette clé.
+
 ### Routes
 
 | Route | Rôle |
