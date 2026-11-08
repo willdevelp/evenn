@@ -2,8 +2,4 @@
   command = "npm run build"
 
 [build.environment]
-  # These URLs, cloud name, and Supabase publishable key are intentionally public.
-  # Keep private auth, database, and API credentials covered by secrets scanning.
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_BASE_URL,NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,BETTER_AUTH_URL"
-  # Override any older site-level exclusions so generated functions are scanned.
-  SECRETS_SCAN_OMIT_PATHS = ""

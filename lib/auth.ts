@@ -3,6 +3,7 @@ import { nextCookies } from "better-auth/next-js";
 import { admin, phoneNumber } from "better-auth/plugins";
 import { pool } from "./db";
 import { normalizeAuthUrl } from "./auth-url";
+import "server-only";
 
 /**
  * Mappage explicite des colonnes.
