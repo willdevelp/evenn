@@ -14,8 +14,6 @@ import {
   Loader2,
   LockKeyhole,
   Medal,
-  Minus,
-  Plus,
   ShieldCheck,
   Smartphone,
   Sparkles,
@@ -37,9 +35,9 @@ import { ContestStatusChip } from "@/src/components/vote/status";
 import { cn } from "@/lib/utils";
 
 const RANK_STYLES: Record<number, string> = {
-  1: "bg-amber-100 text-amber-800 ring-amber-200",
-  2: "bg-slate-100 text-slate-700 ring-slate-200",
-  3: "bg-orange-100 text-orange-800 ring-orange-200",
+  1: "bg-[var(--accent)] text-[var(--on-accent)] ring-[var(--accent)]",
+  2: "bg-[var(--accent-soft)] text-[var(--accent-hover)] ring-[var(--accent-soft)]",
+  3: "bg-[var(--surface-highlight)] text-[var(--text-muted)] ring-[var(--border)]",
 };
 
 const NOTICE_TONES = {
@@ -136,7 +134,7 @@ function StatTile({
 }) {
   return (
     <div className="min-w-0 bg-white p-4 sm:p-5">
-      <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+      <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
         <Icon aria-hidden className="size-3.5 text-brand-500" />
         <span className="truncate">{label}</span>
       </p>
@@ -166,9 +164,7 @@ function VoteModal({
 }) {
   const router = useRouter();
   const panelRef = useRef<HTMLFormElement>(null);
-  const [packId, setPackId] = useState<string>(contest.packs[0]?.id ?? "");
-  const [packQuantity, setPackQuantity] = useState(1);
-  const [votesCount, setVotesCount] = useState(5);
+  const [votesCount, setVotesCount] = useState(1);
   const [buyerName, setBuyerName] = useState("");
   const [buyerEmail, setBuyerEmail] = useState("");
   const [buyerPhone, setBuyerPhone] = useState("");
@@ -176,11 +172,8 @@ function VoteModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const selectedPack = contest.packs.find((pack) => pack.id === packId) ?? null;
-  const totalVotes = selectedPack ? selectedPack.votesCount * packQuantity : votesCount;
-  const totalAmount = selectedPack
-    ? selectedPack.priceAmount * packQuantity
-    : contest.pricePerVote * votesCount;
+  const totalVotes = votesCount;
+  const totalAmount = contest.pricePerVote * votesCount;
 
   /* Accessibilité : fermeture au clavier et verrouillage du défilement. */
   useEffect(() => {
@@ -211,9 +204,7 @@ function VoteModal({
       const order = await createVoteOrder({
         contestId: contest.id,
         candidateId: candidate.id,
-        packId: selectedPack?.id ?? null,
-        packQuantity: selectedPack ? packQuantity : undefined,
-        votesCount: selectedPack ? undefined : votesCount,
+        votesCount,
         buyerName,
         buyerEmail,
         buyerPhone,
@@ -255,7 +246,7 @@ function VoteModal({
                 {candidate.name.slice(0, 1).toUpperCase()}
               </span>
               <div className="min-w-0">
-                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-100">
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--on-accent)]/80">
                   Voter pour
                 </p>
                 <h2
@@ -276,7 +267,7 @@ function VoteModal({
             </button>
           </div>
           <div className="border-t border-white/15 py-3">
-            <p className="text-sm text-brand-100">
+            <p className="text-sm text-[var(--on-accent)]/80">
               <span className="font-bold text-white">
                 {totalVotes.toLocaleString("fr-FR")} vote{totalVotes > 1 ? "s" : ""}
               </span>{" "}
@@ -289,135 +280,47 @@ function VoteModal({
         </header>
 
         <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-6 py-6 sm:px-8">
-          {contest.packs.length > 0 ? (
-            <fieldset className="space-y-2">
-              <legend className="text-sm font-semibold text-slate-800">
-                Choisissez un pack
-                {selectedPack && (
-                  <span className="ml-2 text-xs font-medium text-slate-400">
-                    × {packQuantity} = {(selectedPack.votesCount * packQuantity).toLocaleString("fr-FR")} votes
-                  </span>
-                )}
-              </legend>
-              {contest.packs.map((pack) => {
-                const active = pack.id === packId;
-
-                return (
-                  <label
-                    key={pack.id}
-                    className={cn(
-                      "group flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-4 py-3 transition has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-brand-600/20",
-                      active
-                        ? "border-brand-600 bg-brand-50/50 ring-1 ring-brand-600"
-                        : "border-slate-200 bg-white hover:border-brand-200 hover:bg-slate-50/60",
-                    )}
-                  >
-                    <input
-                      type="radio"
-                      name="vote-pack"
-                      checked={active}
-                      onChange={() => setPackId(pack.id)}
-                      className="sr-only"
-                    />
-                    <span className="flex items-center gap-3">
-                      <span
-                        aria-hidden
-                        className={cn(
-                          "flex size-5 shrink-0 items-center justify-center rounded-full border transition",
-                          active
-                            ? "border-brand-600 bg-brand-600 text-white"
-                            : "border-slate-300 bg-white",
-                        )}
-                      >
-                        {active && <Check aria-hidden className="size-3" strokeWidth={3} />}
-                      </span>
-                      <span>
-                        <span className="block text-sm font-bold text-slate-900">
-                          {pack.name}
-                        </span>
-                        <span className="text-xs text-slate-500">
-                          {pack.votesCount.toLocaleString("fr-FR")} vote
-                          {pack.votesCount > 1 ? "s" : ""}
-                        </span>
-                      </span>
-                    </span>
-                    <span className="whitespace-nowrap text-sm font-bold text-brand-700">
-                      {formatVoteMoney(pack.priceAmount, contest.currency)}
-                    </span>
-                  </label>
-                );
-              })}
-
-              <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
-                <span className="text-sm font-medium text-slate-700">Nombre de packs</span>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setPackQuantity((value) => Math.max(1, value - 1))}
-                    disabled={packQuantity <= 1}
-                    aria-label="Retirer un pack"
-                    className="flex size-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-brand-300 hover:text-brand-600 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-600/20 disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    <Minus aria-hidden className="size-4" />
-                  </button>
-                  <span aria-live="polite" className="w-6 text-center text-sm font-bold text-slate-900">
-                    {packQuantity}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setPackQuantity((value) => Math.min(20, value + 1))}
-                    disabled={packQuantity >= 20}
-                    aria-label="Ajouter un pack"
-                    className="flex size-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-brand-300 hover:text-brand-600 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-600/20 disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    <Plus aria-hidden className="size-4" />
-                  </button>
-                </div>
-              </div>
-            </fieldset>
-          ) : (
-            <fieldset>
-              <legend className="text-sm font-semibold text-slate-800">Nombre de votes</legend>
-              <div className="mt-2.5 flex flex-wrap gap-2">
-                {[1, 5, 10, 25, 50].map((value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setVotesCount(value)}
-                    aria-pressed={votesCount === value}
-                    className={cn(
-                      "rounded-lg border px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-600/20",
-                      votesCount === value
-                        ? "border-brand-600 bg-brand-600 text-white"
-                        : "border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:text-brand-600",
-                    )}
-                  >
-                    {value}
-                  </button>
-                ))}
-              </div>
-              <div className="mt-3 flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
-                <label htmlFor="custom-votes" className="text-sm font-medium text-slate-700">
-                  Votes personnalisés
-                </label>
-                <input
-                  id="custom-votes"
-                  type="number"
-                  inputMode="numeric"
-                  min={1}
-                  max={100000}
-                  value={votesCount}
-                  onChange={(event) =>
-                    setVotesCount(Math.max(1, Math.min(100000, Number(event.target.value) || 1)))
-                  }
-                  className="w-24 rounded-xl border border-slate-200 bg-white px-3 py-2 text-center text-sm font-bold text-slate-900 outline-none transition focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10"
-                />
-              </div>
-              <p className="mt-2 text-xs text-slate-500">
-                Soit {formatVoteMoney(contest.pricePerVote, contest.currency)} par vote.
-              </p>
-            </fieldset>
-          )}
+          <fieldset>
+            <legend className="text-sm font-semibold text-slate-800">Nombre de votes</legend>
+            <div className="mt-2.5 flex flex-wrap gap-2">
+              {[1, 5, 10, 25, 50].map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setVotesCount(value)}
+                  aria-pressed={votesCount === value}
+                  className={cn(
+                    "rounded-lg border px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-600/20",
+                    votesCount === value
+                      ? "border-brand-600 bg-brand-600 text-white"
+                      : "border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:text-brand-600",
+                  )}
+                >
+                  {value}
+                </button>
+              ))}
+            </div>
+            <div className="mt-3 flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
+              <label htmlFor="custom-votes" className="text-sm font-medium text-slate-700">
+                Nombre de votes personnalisé
+              </label>
+              <input
+                id="custom-votes"
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={100000}
+                value={votesCount}
+                onChange={(event) =>
+                  setVotesCount(Math.max(1, Math.min(100000, Number(event.target.value) || 1)))
+                }
+                className="w-24 rounded-xl border border-slate-200 bg-white px-3 py-2 text-center text-sm font-bold text-slate-900 outline-none transition focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10"
+              />
+            </div>
+            <p className="mt-2 text-xs text-slate-500">
+              {formatVoteMoney(contest.pricePerVote, contest.currency)} par vote.
+            </p>
+          </fieldset>
 
           <fieldset>
             <legend className="flex items-center gap-2 text-sm font-semibold text-slate-800">
@@ -492,7 +395,7 @@ function VoteModal({
           </div>
 
           <p className="flex items-start gap-2.5 rounded-xl bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-500">
-            <ShieldCheck aria-hidden size={15} className="mt-0.5 shrink-0 text-emerald-600" />
+            <ShieldCheck aria-hidden size={15} className="mt-0.5 shrink-0 text-brand-600" />
             Les votes ne sont crédités qu’après la vérification du paiement, signature
             et montant contrôlés côté serveur.
           </p>
@@ -552,7 +455,7 @@ export default function VoteClient({ contest }: { contest: ContestVotePage }) {
   const steps = [
     {
       title: "Choisissez un candidat",
-      description: "Sélectionnez un pack de votes ou un montant personnalisé.",
+      description: "Choisissez le nombre de votes à attribuer.",
     },
     {
       title: "Renseignez vos coordonnées",
@@ -721,7 +624,7 @@ export default function VoteClient({ contest }: { contest: ContestVotePage }) {
                               {candidate.name}
                             </h3>
                             {candidate.number !== null && (
-                              <p className="mt-0.5 text-xs text-slate-400">
+                              <p className="mt-0.5 text-xs text-slate-500">
                                 N° {candidate.number}
                               </p>
                             )}
@@ -810,28 +713,6 @@ export default function VoteClient({ contest }: { contest: ContestVotePage }) {
               </div>
             </section>
 
-            {contest.packs.length > 0 && (
-              <section className="rounded-2xl border border-slate-200/80 bg-white px-5 py-4 shadow-card">
-                <p className="flex items-center gap-2 text-sm font-bold text-slate-950">
-                  <BadgeCheck aria-hidden className="size-4 text-brand-600" />
-                  Packs disponibles
-                </p>
-                <div className="mt-1 divide-y divide-slate-100">
-                  {contest.packs.map((pack) => (
-                    <div
-                      key={pack.id}
-                      className="flex items-center justify-between gap-3 py-2.5 text-xs"
-                    >
-                      <span className="font-semibold text-slate-700">{pack.name}</span>
-                      <span className="font-bold text-brand-700">
-                        {formatVoteMoney(pack.priceAmount, contest.currency)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
             {contest.rules && (
               <section className="rounded-2xl border border-slate-200/80 bg-white px-5 py-4 shadow-card">
                 <p className="flex items-center gap-2 text-sm font-bold text-slate-950">
@@ -844,7 +725,7 @@ export default function VoteClient({ contest }: { contest: ContestVotePage }) {
               </section>
             )}
 
-            <p className="flex items-center justify-center gap-2 text-xs text-slate-400">
+            <p className="flex items-center justify-center gap-2 text-xs text-slate-500">
               <CalendarDays aria-hidden size={13} />
               {formatVoteDateTime(contest.startsAt)} — {formatVoteDateTime(contest.endsAt)}
             </p>

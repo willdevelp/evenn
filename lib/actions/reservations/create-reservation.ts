@@ -8,6 +8,7 @@ import { withTransaction } from "@/lib/db";
 import { fulfillPaidOrder } from "@/lib/payments/fulfill";
 import { makeTicketToken } from "@/lib/tickets";
 import { ticketReservationSchema } from "@/lib/actions/validation";
+import { calculatePlatformCommission } from "@/lib/commission";
 
 export type ReservationSummary = {
   id: string;
@@ -87,13 +88,18 @@ export async function createReservation(
           d.id               AS event_date_id
          FROM events e
          LEFT JOIN LATERAL (
-           SELECT id
+           SELECT id, starts_at, ends_at
              FROM event_dates
             WHERE event_id = e.id
+              AND COALESCE(ends_at, starts_at) > now()
             ORDER BY starts_at ASC
             LIMIT 1
          ) d ON TRUE
-        WHERE e.id = $1`,
+        WHERE e.id = $1
+          AND (
+            d.id IS NOT NULL
+            OR NOT EXISTS (SELECT 1 FROM event_dates ed WHERE ed.event_id = e.id)
+          )`,
       [values.eventId],
     );
 
@@ -147,6 +153,7 @@ export async function createReservation(
 
     const unitPrice = Number(ticketType.price_amount);
     const subtotal = unitPrice * quantity;
+    const commission = calculatePlatformCommission(subtotal);
 
     const { rows: orders } = await client.query<{
       id: string;
@@ -159,7 +166,7 @@ export async function createReservation(
           subtotal_amount, discount_amount, fee_amount,
           platform_commission_amount, total_amount, paid_at
        )
-       VALUES ($1, 'ticket', 'pending', $2, $3, $4, $5, $6, $7, 0, 0, 0, $7, NULL)
+       VALUES ($1, 'ticket', 'pending', $2, $3, $4, $5, $6, $7, 0, 0, $8, $7, NULL)
        RETURNING id, order_number, status::text AS status`,
       [
         event.organization_id,
@@ -169,6 +176,7 @@ export async function createReservation(
         values.buyerPhone || null,
         ticketType.currency || "XAF",
         subtotal,
+        commission,
       ],
     );
 

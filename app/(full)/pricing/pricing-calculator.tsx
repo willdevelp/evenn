@@ -88,7 +88,7 @@ export default function PricingCalculator({
               className="h-2 w-full cursor-pointer accent-brand-600"
             />
           </div>
-          <p className="flex items-center gap-2 text-xs text-slate-400">
+          <p className="flex items-center gap-2 text-xs text-slate-500">
             <BadgeCheck aria-hidden className="size-3.5 text-brand-500" />
             Taux appliqué : {percent.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} %
             {fixedAmount > 0 && ` + ${format(fixedAmount)} par commande`}
@@ -97,21 +97,21 @@ export default function PricingCalculator({
 
         <div className="flex flex-col justify-center gap-5 bg-brand-600 p-8 text-white sm:p-10">
           <div className="flex justify-between gap-4 text-sm">
-            <span className="text-brand-100">Volume de billetterie</span>
+            <span className="text-[var(--on-accent)]/80">Volume de billetterie</span>
             <span className="text-right font-semibold">{format(gmv)}</span>
           </div>
           <div className="flex justify-between gap-4 text-sm">
-            <span className="text-brand-100">Commission Evenn</span>
+            <span className="text-[var(--on-accent)]/80">Commission Evenn</span>
             <span className="text-right font-semibold">- {format(commission)}</span>
           </div>
           <div className="border-t border-dashed border-white/30 pt-5">
-            <p className="text-sm font-medium text-brand-100">Vous touchez</p>
+            <p className="text-sm font-medium text-[var(--on-accent)]/80">Vous touchez</p>
             <p
               className="mt-1 text-4xl font-bold tracking-tight sm:text-5xl"
               aria-live="polite"
             >
               {net.toLocaleString("fr-FR")}{" "}
-              <span className="text-lg font-bold text-brand-100">{currency}</span>
+              <span className="text-lg font-bold text-[var(--on-accent)]/80">{currency}</span>
             </p>
           </div>
         </div>

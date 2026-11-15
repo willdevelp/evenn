@@ -5,7 +5,11 @@ import { revalidatePath } from "next/cache";
 import { withTransaction } from "@/lib/db";
 import { requireOrganization } from "@/lib/actions/organizations/require-organization";
 import { requireUser } from "@/lib/session";
-import { EVENT_TYPE_META, resolveSiteEventType } from "@/lib/sites/catalog";
+import {
+  EVENT_TYPE_META,
+  resolveSiteEventType,
+  SITE_EVENT_FIELDS,
+} from "@/lib/sites/catalog";
 import { buildSiteSections } from "@/lib/sites/render";
 import { getSiteUrl } from "@/lib/sites/url";
 import { getSiteTemplateById } from "@/lib/sites/templates-db";
@@ -113,6 +117,11 @@ export async function createEventSite(input: unknown): Promise<CreatedEventSite>
       throw new Error("Le modèle choisi ne correspond pas au type de l'événement.");
     }
 
+    const allowedDetailKeys = new Set(SITE_EVENT_FIELDS[eventType].map((field) => field.key));
+    if (Object.keys(data.eventDetails).some((key) => !allowedDetailKeys.has(key))) {
+      throw new Error("Les informations fournies ne correspondent pas au type de cet événement.");
+    }
+
     if (RESERVED_SUBDOMAINS.has(data.subdomain)) {
       throw new Error("Ce sous-domaine est réservé par la plateforme.");
     }
@@ -162,7 +171,7 @@ export async function createEventSite(input: unknown): Promise<CreatedEventSite>
       publicUrl,
     };
 
-    const sections = buildSiteSections(template, eventSummary);
+    const sections = buildSiteSections(template, eventSummary, data.eventDetails);
     const meta = EVENT_TYPE_META[eventType];
     const theme = {
       ...data.theme,

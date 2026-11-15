@@ -29,6 +29,7 @@ export const createEventSiteSchema = z
         "Le sous-domaine doit contenir uniquement des lettres minuscules, des chiffres et des tirets.",
       ),
     theme: siteThemeSchema,
+    eventDetails: z.record(z.string(), z.string().trim().max(1000)).default({}),
   })
   .strict();
 

@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 
 import { getEventsById, getSimilarEvents } from "@/lib/actions/events/get-event-by-id";
 import EventDetailClient from "./EventDetailClient";
+import Header from "@/src/components/ui/header";
+import Footer from "@/src/components/ui/footer";
 
 export const dynamic = "force-dynamic";
 
@@ -57,5 +59,11 @@ export default async function EventDetailPage({
     attendees: storedEvent.total_sold,
   };
 
-  return <EventDetailClient event={event} similarEvents={similarEvents} />;
+  return (
+      <>
+  <Header/>
+    <EventDetailClient event={event} similarEvents={similarEvents} />
+    <Footer />
+  </>
+  );
 }

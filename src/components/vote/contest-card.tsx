@@ -72,7 +72,7 @@ export default function ContestCard({
         <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500">
           {meta.map(({ icon: Icon, value }) => (
             <span key={value} className="flex items-center gap-1.5">
-              <Icon aria-hidden className="size-3.5 text-slate-400" />
+              <Icon aria-hidden className="size-3.5 text-slate-500" />
               {value}
             </span>
           ))}
@@ -82,10 +82,10 @@ export default function ContestCard({
           {contest.mode === "paid" ? (
             <span className="text-xs font-semibold text-slate-600">
               {contest.pricePerVote.toLocaleString("fr-FR")} {contest.currency}
-              <span className="text-slate-400"> / vote</span>
+              <span className="text-slate-500"> / vote</span>
             </span>
           ) : (
-            <span className="text-xs font-semibold text-emerald-600">Vote gratuit</span>
+            <span className="text-xs font-semibold text-brand-600">Vote gratuit</span>
           )}
           <span className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-600">
             Voter

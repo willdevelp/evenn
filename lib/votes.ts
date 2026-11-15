@@ -3,9 +3,6 @@ import { createHash } from "node:crypto";
 /** Nombre maximum de votes achetables en une seule commande. */
 export const MAX_VOTES_PER_ORDER = 100_000;
 
-/** Nombre maximum de packs identiques achetables en une seule commande. */
-export const MAX_PACKS_PER_ORDER = 20;
-
 /**
  * Empreinte non réversible du téléphone du votant.
  * Le poivre (`VOTE_HASH_PEPPER`) permet de rendre les empreintes inutilisables

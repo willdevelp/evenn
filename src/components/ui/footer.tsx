@@ -32,27 +32,27 @@ const columns = [
 ];
 
 const ring =
-  "rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B6FE0] dark:focus-visible:ring-[#8FB0FF]";
-const link = `transition-colors hover:text-slate-950 dark:hover:text-white ${ring}`;
+  "rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]";
+const link = `transition-colors hover:text-[var(--heading)] ${ring}`;
 
 export default async function Footer() {
   const settings = await getPublicSettings();
   const phoneHref = settings.contactPhone?.replace(/[^\d+]/g, "");
 
   return (
-    <footer className="border-t border-slate-200 bg-white text-sm text-slate-600 dark:border-white/10 dark:bg-[#0E1117] dark:text-slate-400">
+    <footer className="border-t border-[var(--border)] bg-[var(--surface)] text-sm text-[var(--text-muted)]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* Bandeau d’appel */}
-        <div className="flex flex-col gap-6 border-b border-slate-200 py-12 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-6 border-b border-[var(--border)] py-12 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+            <h2 className="text-2xl font-bold tracking-tight text-[var(--heading)] sm:text-3xl">
               Ton prochain événement commence ici.
             </h2>
             <p className="mt-2">Cinq minutes pour le créer. Aucune carte bancaire pour essayer.</p>
           </div>
           <Link
             href="/auth/register"
-            className="group inline-flex h-12 shrink-0 items-center gap-2 rounded-xl bg-[#3B6FE0] px-6 font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#3B6FE0]/30 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[#3B6FE0]/40 dark:bg-[#8FB0FF] dark:text-[#0E1117] dark:hover:shadow-[#8FB0FF]/20"
+            className="group inline-flex h-12 shrink-0 items-center gap-2 rounded-xl bg-[var(--accent)] px-6 font-semibold text-[var(--on-accent)] transition hover:-translate-y-0.5 hover:bg-[var(--accent-hover)] hover:shadow-lg focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[var(--accent)]/40"
           >
             Créer mon événement
             <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
@@ -65,9 +65,9 @@ export default async function Footer() {
             <Link
               href="/"
               aria-label="Evenn, accueil"
-              className={`inline-flex items-center gap-2.5 text-xl font-bold tracking-tight text-slate-950 dark:text-white ${ring}`}
+              className={`inline-flex items-center gap-2.5 text-xl font-bold tracking-tight text-[var(--heading)] ${ring}`}
             >
-              <span className="flex size-8 items-center justify-center rounded-[9px] bg-[#3B6FE0] text-lg text-white dark:bg-[#8FB0FF] dark:text-[#0E1117]">
+              <span className="flex size-8 items-center justify-center rounded-[9px] bg-[var(--accent)] text-lg text-[var(--on-accent)]">
                 E
               </span>
               Evenn
@@ -81,7 +81,7 @@ export default async function Footer() {
                   <a
                     href={`mailto:${settings.contactEmail}`}
                     aria-label="Nous écrire par email"
-                    className={`flex size-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition hover:border-[#3B6FE0] hover:text-[#3B6FE0] dark:border-white/10 dark:text-slate-400 dark:hover:border-[#8FB0FF] dark:hover:text-[#8FB0FF] ${ring}`}
+                    className={`flex size-10 items-center justify-center rounded-xl border border-[var(--border)] text-[var(--text-muted)] transition hover:border-[var(--accent)] hover:text-[var(--accent)] ${ring}`}
                   >
                     <Mail aria-hidden className="size-[18px]" strokeWidth={1.75} />
                   </a>
@@ -90,7 +90,7 @@ export default async function Footer() {
                   <a
                     href={`tel:${phoneHref}`}
                     aria-label="Nous appeler"
-                    className={`flex size-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition hover:border-[#3B6FE0] hover:text-[#3B6FE0] dark:border-white/10 dark:text-slate-400 dark:hover:border-[#8FB0FF] dark:hover:text-[#8FB0FF] ${ring}`}
+                    className={`flex size-10 items-center justify-center rounded-xl border border-[var(--border)] text-[var(--text-muted)] transition hover:border-[var(--accent)] hover:text-[var(--accent)] ${ring}`}
                   >
                     <Phone aria-hidden className="size-[18px]" strokeWidth={1.75} />
                   </a>
@@ -101,7 +101,7 @@ export default async function Footer() {
 
           {columns.map((col) => (
             <nav key={col.title} aria-label={col.title}>
-              <h3 className="font-semibold text-slate-950 dark:text-white">{col.title}</h3>
+              <h3 className="font-semibold text-[var(--heading)]">{col.title}</h3>
               <ul className="mt-4 space-y-3">
                 {col.links.map((l) => (
                   <li key={l.label}>
@@ -116,7 +116,7 @@ export default async function Footer() {
         </div>
 
         {/* Bas de page */}
-        <div className="flex flex-col gap-2 border-t border-slate-200 py-6 text-xs text-slate-500 dark:border-white/10 dark:text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 border-t border-[var(--border)] py-6 text-xs text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} Evenn. Tous droits réservés.</p>
         </div>
       </div>

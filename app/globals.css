@@ -140,6 +140,193 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  --bg: #F5F8FF;
+  --surface: #FFFFFF;
+  --surface-highlight: #EEF5FF;
+  --accent-soft: #DBEAFE;
+  --border: #E2E8F0;
+  --heading: #0F172A;
+  --text: #334155;
+  --text-muted: #64748B;
+  --text-faint: #94A3B8;
+  --accent: #2563EB;
+  --accent-hover: #1D4ED8;
+  --accent-ring: rgba(37, 99, 235, 0.25);
+  --on-accent: #FFFFFF;
+}
+
+/* ---------------------------------------------------------------------------
+ * Direction artistique publique — périmètre : app/(full) uniquement.
+ *
+ * Toutes les pages du groupe (full) sont enveloppées dans `.full-theme`.
+ * On y redéfinit les tokens Tailwind (brand, slate, surface, sky, feedback)
+ * pour qu'ils pointent vers la palette bleu clair. Les composants continuent
+ * d'utiliser leurs classes habituelles (bg-brand-600, text-slate-900…),
+ * mais elles se résolvent désormais dans ces variables, sans couleur en dur.
+ *
+ * La variante sombre est volontairement laissée de côté : la DA publique
+ * est claire (60 % fond #F5F8FF, 30 % surfaces blanches, 10 % accent bleu).
+ * ------------------------------------------------------------------------- */
+.full-theme {
+  /* Palette */
+  --bg: #f5f8ff;
+  --surface: #ffffff;
+  --surface-highlight: #eef5ff;
+  --accent-soft: #dbeafe;
+  --border: #e2e8f0;
+  --heading: #0f172a;
+  --text: #334155;
+  --text-muted: #64748b;
+  --text-faint: #94a3b8;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --on-accent: #ffffff;
+
+  /* Feedback sémantique — réservé aux statuts, jamais à l'accent principal. */
+  --success: #047857;
+  --success-soft: #ecfdf5;
+  --success-border: #a7f3d0;
+  --warning: #b45309;
+  --warning-soft: #fffbeb;
+  --warning-border: #fde68a;
+  --danger: #dc2626;
+  --danger-soft: #fef2f2;
+  --danger-border: #fecaca;
+
+  /* Alias shadcn/ui : les composants génériques suivent la DA. */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--heading);
+  --popover: var(--surface);
+  --popover-foreground: var(--heading);
+  --primary: var(--accent);
+  --primary-foreground: var(--on-accent);
+  --secondary: var(--surface-highlight);
+  --secondary-foreground: var(--accent-hover);
+  --muted: var(--surface-highlight);
+  --muted-foreground: var(--text-muted);
+  --accent-foreground: var(--on-accent);
+  --destructive: var(--danger);
+  --input: var(--border);
+  --ring: var(--accent);
+
+  /* Remappage des échelles Tailwind utilisées dans (full). */
+  --color-surface: var(--bg);
+
+  --color-brand-50: var(--surface-highlight);
+  --color-brand-100: var(--accent-soft);
+  --color-brand-200: var(--accent-soft);
+  --color-brand-300: #93c5fd;
+  --color-brand-400: var(--accent);
+  --color-brand-500: var(--accent);
+  --color-brand-600: var(--accent);
+  --color-brand-700: var(--accent-hover);
+  --color-brand-800: var(--accent-hover);
+  --color-brand-900: var(--heading);
+  --color-brand-950: var(--heading);
+
+  --color-slate-50: var(--surface-highlight);
+  --color-slate-100: var(--border);
+  --color-slate-200: var(--border);
+  --color-slate-300: var(--text-faint);
+  --color-slate-400: var(--text-faint);
+  --color-slate-500: var(--text-muted);
+  --color-slate-600: var(--text-muted);
+  --color-slate-700: var(--text);
+  --color-slate-800: var(--text);
+  --color-slate-900: var(--heading);
+  --color-slate-950: var(--heading);
+
+  --color-sky-50: var(--surface-highlight);
+  --color-sky-100: var(--surface-highlight);
+  --color-sky-200: var(--accent-soft);
+  --color-sky-300: var(--accent-soft);
+  --color-sky-400: var(--accent);
+  --color-sky-500: var(--accent);
+  --color-sky-600: var(--accent-hover);
+
+  --color-blue-50: var(--surface-highlight);
+  --color-blue-100: var(--accent-soft);
+  --color-blue-200: var(--accent-soft);
+  --color-blue-600: var(--accent);
+  --color-blue-700: var(--accent-hover);
+  --color-blue-950: var(--heading);
+
+  --color-emerald-50: var(--success-soft);
+  --color-emerald-100: var(--success-soft);
+  --color-emerald-200: var(--success-border);
+  --color-emerald-300: var(--success);
+  --color-emerald-400: var(--success);
+  --color-emerald-500: var(--success);
+  --color-emerald-600: var(--success);
+  --color-emerald-700: var(--success);
+  --color-emerald-800: var(--success);
+  --color-emerald-900: var(--success);
+
+  --color-amber-50: var(--warning-soft);
+  --color-amber-100: var(--warning-soft);
+  --color-amber-200: var(--warning-border);
+  --color-amber-300: var(--warning);
+  --color-amber-400: var(--warning);
+  --color-amber-500: var(--warning);
+  --color-amber-600: var(--warning);
+  --color-amber-700: var(--warning);
+  --color-amber-800: var(--warning);
+  --color-orange-100: var(--warning-soft);
+  --color-orange-200: var(--warning-border);
+  --color-orange-800: var(--warning);
+
+  --color-rose-50: var(--danger-soft);
+  --color-rose-100: var(--danger-soft);
+  --color-rose-200: var(--danger-border);
+  --color-rose-300: var(--danger);
+  --color-rose-400: var(--danger);
+  --color-rose-500: var(--danger);
+  --color-rose-600: var(--danger);
+  --color-rose-700: var(--danger);
+
+  /* Blanc et noir suivent aussi les surfaces : aucune valeur brute côté composant. */
+  --color-white: var(--surface);
+  --color-black: var(--heading);
+
+  --shadow-glow: 0 0 14px 3px rgb(37 99 235 / 0.35);
+
+  color-scheme: light;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* Grilles décoratives : les lignes sont dérivées des variables, pas de hex. */
+.full-theme .full-grid-subtle {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--border) 12%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--border) 12%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 48px 48px;
+}
+
+.full-theme .full-grid-accent {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--on-accent) 8%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--on-accent) 8%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 40px 40px;
 }
 
 /* .dark {

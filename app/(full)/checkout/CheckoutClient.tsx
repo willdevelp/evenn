@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import type { ReservationDetail } from "@/lib/actions/reservations/get-reservation";
 import TicketCodes from "@/src/components/ui/code";
+import Header from "@/src/components/ui/header";
+import Footer from "@/src/components/ui/footer";
 
 const formatCurrency = (value: number) =>
   `${value.toLocaleString("fr-FR")} FCFA`;
@@ -44,6 +46,8 @@ export default function CheckoutClient({
 }) {
   if (!reservation) {
     return (
+      <>
+      
       <main className="flex min-h-[65vh] items-center justify-center bg-slate-50 px-4 py-16">
         <section className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
@@ -65,6 +69,7 @@ export default function CheckoutClient({
           </Link>
         </section>
       </main>
+      </>
     );
   }
 
@@ -73,6 +78,8 @@ export default function CheckoutClient({
   const isConfirmed = reservation.status === "paid";
 
   return (
+    <>
+    <Header />
     <main className="min-h-[65vh] bg-slate-50 px-4 py-12 sm:px-6 sm:py-16">
       <div className="mx-auto max-w-6xl">
         <Link
@@ -173,11 +180,11 @@ export default function CheckoutClient({
 
             <div className="mt-6 grid gap-3 rounded-2xl border border-slate-200 p-4 text-sm sm:grid-cols-2">
               <p className="flex items-center gap-2 text-slate-600">
-                <User size={14} className="text-slate-400" />
+                <User size={14} className="text-slate-500" />
                 {reservation.buyerName ?? "—"}
               </p>
               <p className="flex items-center gap-2 text-slate-600">
-                <Mail size={14} className="text-slate-400" />
+                <Mail size={14} className="text-slate-500" />
                 {reservation.buyerEmail ?? "Email non renseigné"}
               </p>
             </div>
@@ -185,7 +192,7 @@ export default function CheckoutClient({
 
           <aside className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <div className="mb-5 flex items-center gap-2 text-sm font-semibold text-slate-700">
-              <ShieldCheck size={18} className="text-emerald-600" />
+              <ShieldCheck size={18} className="text-brand-600" />
               Vos billets électroniques
             </div>
             {isConfirmed ? (
@@ -203,5 +210,7 @@ export default function CheckoutClient({
         </div>
       </div>
     </main>
+    <Footer />
+  </>
   );
 }

@@ -117,6 +117,12 @@ export type AnalyticsData = {
   dailySales: { date: string; sales: number }[];
   ticketTypes: { name: string; sold: number }[];
   topEvents: TopEvent[];
+  votes: number;
+  paidVotes: number;
+  voteRevenue: { currency: string; gross: number; commission: number; orders: number }[];
+  dailyVotes: { date: string; votes: number }[];
+  topContests: { id: string; title: string; votes: number }[];
+  topCandidates: { id: string; name: string; contestTitle: string; votes: number }[];
 };
 
 export type OrganizerEvent = {
@@ -520,7 +526,18 @@ export async function getAnalytics(): Promise<AnalyticsData> {
   const organization = await requireOrganization();
   const orgId = organization.id;
 
-  const [totals, daily, types, top, currency] = await Promise.all([
+  const [
+    totals,
+    daily,
+    types,
+    top,
+    voteTotals,
+    dailyVotes,
+    voteRevenue,
+    topContests,
+    topCandidates,
+    currency,
+  ] = await Promise.all([
     pool.query(
       `SELECT
          (SELECT COALESCE(sum(tt.quantity_sold), 0) FROM ticket_types tt
@@ -578,6 +595,80 @@ export async function getAnalytics(): Promise<AnalyticsData> {
         LIMIT 5`,
       [orgId],
     ),
+    pool.query(
+      `SELECT
+         COALESCE(sum(v.quantity), 0)::text AS votes,
+         COALESCE(sum(v.quantity) FILTER (WHERE v.source::text = 'paid'), 0)::text AS paid_votes
+         FROM votes v
+         JOIN contests c ON c.id = v.contest_id
+        WHERE c.organization_id = $1
+          AND c.deleted_at IS NULL
+          AND v.is_cancelled = false`,
+      [orgId],
+    ),
+    pool.query(
+      `WITH days AS (
+         SELECT generate_series(current_date - 6, current_date, interval '1 day')::date AS day
+       ), daily_votes AS (
+         SELECT v.created_at::date AS day, sum(v.quantity) AS votes
+           FROM votes v
+           JOIN contests c ON c.id = v.contest_id
+          WHERE c.organization_id = $1
+            AND c.deleted_at IS NULL
+            AND v.is_cancelled = false
+            AND v.created_at >= current_date - 6
+            AND v.created_at < current_date + 1
+          GROUP BY v.created_at::date
+       )
+       SELECT days.day::text AS date, COALESCE(daily_votes.votes, 0)::text AS votes
+         FROM days
+         LEFT JOIN daily_votes ON daily_votes.day = days.day
+        ORDER BY days.day`,
+      [orgId],
+    ),
+    pool.query(
+      `SELECT paid_orders.currency,
+              sum(paid_orders.total_amount)::text AS gross,
+              sum(paid_orders.platform_commission_amount)::text AS commission,
+              count(*)::int AS orders
+         FROM (
+           SELECT DISTINCT o.id, o.currency, o.total_amount, o.platform_commission_amount
+             FROM orders o
+             JOIN vote_purchases vp ON vp.order_id = o.id
+             JOIN contests c ON c.id = vp.contest_id
+            WHERE o.organization_id = $1
+              AND o.kind::text = 'vote'
+              AND o.status::text = 'paid'
+              AND c.organization_id = $1
+              AND c.deleted_at IS NULL
+         ) AS paid_orders
+        GROUP BY paid_orders.currency
+        ORDER BY paid_orders.currency`,
+      [orgId],
+    ),
+    pool.query(
+      `SELECT c.id, c.title, sum(v.quantity)::text AS votes
+         FROM contests c
+         JOIN votes v ON v.contest_id = c.id AND v.is_cancelled = false
+        WHERE c.organization_id = $1 AND c.deleted_at IS NULL
+        GROUP BY c.id
+        ORDER BY sum(v.quantity) DESC, c.title ASC
+        LIMIT 5`,
+      [orgId],
+    ),
+    pool.query(
+      `SELECT ca.id, ca.name, c.title AS contest_title, sum(v.quantity)::text AS votes
+         FROM votes v
+         JOIN contests c ON c.id = v.contest_id
+         JOIN candidates ca ON ca.id = v.candidate_id AND ca.contest_id = c.id
+        WHERE c.organization_id = $1
+          AND c.deleted_at IS NULL
+          AND v.is_cancelled = false
+        GROUP BY ca.id, c.title
+        ORDER BY sum(v.quantity) DESC, ca.name ASC
+        LIMIT 5`,
+      [orgId],
+    ),
     getCurrency(),
   ]);
 
@@ -598,6 +689,29 @@ export async function getAnalytics(): Promise<AnalyticsData> {
       sold: Number(item.sold),
       capacity: Number(item.capacity),
       revenue: Number(item.revenue),
+    })),
+    votes: Number(voteTotals.rows[0]?.votes ?? 0),
+    paidVotes: Number(voteTotals.rows[0]?.paid_votes ?? 0),
+    voteRevenue: voteRevenue.rows.map((item) => ({
+      currency: item.currency,
+      gross: Number(item.gross),
+      commission: Number(item.commission),
+      orders: Number(item.orders),
+    })),
+    dailyVotes: dailyVotes.rows.map((item) => ({
+      date: item.date,
+      votes: Number(item.votes),
+    })),
+    topContests: topContests.rows.map((item) => ({
+      id: item.id,
+      title: item.title,
+      votes: Number(item.votes),
+    })),
+    topCandidates: topCandidates.rows.map((item) => ({
+      id: item.id,
+      name: item.name,
+      contestTitle: item.contest_title,
+      votes: Number(item.votes),
     })),
   };
 }

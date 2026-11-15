@@ -12,9 +12,9 @@ import Footer from "@/src/components/ui/footer";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Contact | Masturi",
+  title: "Contact | Evenn",
   description:
-    "Une question sur Masturi ? Écrivez-nous : notre équipe vous répond dans les plus brefs délais.",
+    "Une question sur Evenn ? Écrivez-nous : notre équipe vous répond dans les plus brefs délais.",
 };
 
 export default async function ContactPage() {
@@ -72,7 +72,7 @@ export default async function ContactPage() {
       <section className="relative isolate overflow-hidden bg-brand-600 text-white">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)] bg-[size:40px_40px]"
+          className="full-grid-accent pointer-events-none absolute inset-0"
         />
         <div
           aria-hidden
@@ -84,7 +84,7 @@ export default async function ContactPage() {
             <h1 className="text-balance text-4xl font-bold leading-[1.06] tracking-tight sm:text-5xl lg:text-6xl">
               Contactez-nous.
             </h1>
-            <p className="mt-5 text-base leading-7 text-brand-50/90 sm:text-lg sm:leading-8">
+            <p className="mt-5 text-base leading-7 text-[var(--on-accent)]/90 sm:text-lg sm:leading-8">
               Une question, une demande particulière ou juste un bonjour ? Nous sommes là pour
               vous répondre dans les plus brefs délais.
             </p>
@@ -128,11 +128,11 @@ export default async function ContactPage() {
               <section className="relative overflow-hidden rounded-3xl bg-brand-600 p-6 text-white">
                 <div
                   aria-hidden
-                  className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)] bg-[size:32px_32px]"
+                  className="full-grid-accent pointer-events-none absolute inset-0"
                 />
                 <div className="relative">
                   <h2 className="text-base font-bold">Un projet en tête ?</h2>
-                  <p className="mt-2 text-sm leading-6 text-brand-50/90">
+                  <p className="mt-2 text-sm leading-6 text-[var(--on-accent)]/90">
                     Décrivez-nous votre besoin dans le formulaire, notre équipe vous répondra
                     dans les meilleurs délais.
                   </p>

@@ -21,10 +21,15 @@ type TemplateRow = {
 let seedPromise: Promise<void> | null = null;
 
 /**
- * Crée les 21 modèles du catalogue (3 par type d'événement) s'ils n'existent
- * pas encore. Le schéma `site_templates` est la source utilisée par
- * `sites.template_id` ; on ne peut donc pas se contenter du catalogue en
- * mémoire.
+ * Incrémenter cette version force la mise à jour des modèles du catalogue en
+ * base (contenu des sections, palettes, ordre). Les modèles absents sont créés.
+ */
+const TEMPLATE_SCHEMA_VERSION = 2;
+
+/**
+ * Crée ou met à jour les 21 modèles du catalogue (3 par type d'événement).
+ * Le schéma `site_templates` est la source utilisée par `sites.template_id` ;
+ * on ne peut donc pas se contenter du catalogue en mémoire.
  */
 export function ensureSiteTemplatesSeeded(): Promise<void> {
   if (!seedPromise) {
@@ -37,12 +42,19 @@ export function ensureSiteTemplatesSeeded(): Promise<void> {
 }
 
 async function seedTemplates(): Promise<void> {
-  const { rows } = await pool.query<{ key: string }>("SELECT key FROM site_templates");
-  const existing = new Set(rows.map((row) => row.key));
-  const missing = SITE_TEMPLATES.filter((template) => !existing.has(template.key));
+  const { rows } = await pool.query<{ key: string; schema: Record<string, unknown> | null }>(
+    "SELECT key, schema FROM site_templates",
+  );
+  const versions = new Map(
+    rows.map((row) => [row.key, Number(row.schema?.schemaVersion ?? 0) || 0]),
+  );
+  const outdated = SITE_TEMPLATES.filter(
+    (template) => (versions.get(template.key) ?? -1) < TEMPLATE_SCHEMA_VERSION,
+  );
 
-  for (const template of missing) {
+  for (const template of outdated) {
     const schema = {
+      schemaVersion: TEMPLATE_SCHEMA_VERSION,
       eventType: template.eventType,
       variant: template.variant,
       layout: template.layout,
@@ -87,6 +99,7 @@ function rowToOption(row: TemplateRow): SiteTemplateOption {
     eventType: (schema.eventType as SiteEventType | undefined) ?? fallback.eventType,
     description: (schema.description as string | undefined) ?? fallback.description,
     layout: (schema.layout as SiteTemplateLayout | undefined) ?? fallback.layout,
+    variant: (schema.variant as string | undefined) ?? fallback.variant,
     palette: asPalette(schema.palette, fallback.palette),
     sections: (schema.sections as SiteSectionTemplate[] | undefined) ?? fallback.sections,
   };

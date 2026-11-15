@@ -14,7 +14,7 @@ import { normalizeAuthUrl } from "./auth-url";
  *   `signUp.email` / `updateUser` soient typés correctement.
  * - Les plugins doivent refléter la configuration serveur (lib/auth.ts).
  */
-export const authClient = createAuthClient({
+export const authClient = createAuthClient({  
   // Prerendering also initializes this client and reads the server environment.
   // In the browser, Better Auth continues to infer the current origin.
   baseURL: normalizeAuthUrl(process.env.BETTER_AUTH_URL),

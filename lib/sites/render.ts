@@ -1,5 +1,9 @@
 import type { SiteSection } from "@/lib/sites";
-import { EVENT_TYPE_META, type SiteTemplateDefinition } from "@/lib/sites/catalog";
+import {
+  EVENT_TYPE_META,
+  SITE_EVENT_FIELDS,
+  type SiteTemplateDefinition,
+} from "@/lib/sites/catalog";
 import type { SiteEventSummary, SiteTemplateOption } from "@/lib/sites/types";
 
 const TOKEN_PATTERN = /\{\{\s*([a-zA-Z0-9_.]+)\s*\}\}/g;
@@ -26,6 +30,7 @@ function replaceTokens(value: unknown, variables: Record<string, string>): unkno
 export function buildSiteSections(
   template: SiteTemplateOption | SiteTemplateDefinition,
   event: SiteEventSummary,
+  eventDetails: Record<string, string> = {},
 ): SiteSection[] {
   const meta = EVENT_TYPE_META[template.eventType];
   const variables: Record<string, string> = {
@@ -45,7 +50,7 @@ export function buildSiteSections(
     "event.publicUrl": event.publicUrl,
   };
 
-  return template.sections
+  const sections = template.sections
     .map((section) => ({
       type: section.type,
       content: replaceTokens(section.content, variables) as Record<string, unknown>,
@@ -57,4 +62,20 @@ export function buildSiteSections(
       if (section.type === "story" && !section.content.body) return false;
       return true;
     });
+
+  const fields = SITE_EVENT_FIELDS[template.eventType]
+    .map(({ key, label }) => ({ label, value: eventDetails[key]?.trim() ?? "" }))
+    .filter((field) => field.value);
+
+  if (fields.length > 0) {
+    const detailsSection = {
+      type: "custom_details",
+      content: { heading: `Informations — ${meta.label}`, fields },
+      isVisible: true,
+    };
+    const ctaIndex = sections.findIndex((section) => section.type === "cta");
+    sections.splice(ctaIndex === -1 ? sections.length : ctaIndex, 0, detailsSection);
+  }
+
+  return sections;
 }

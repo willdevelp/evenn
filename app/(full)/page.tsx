@@ -121,7 +121,7 @@ const steps = [
   {
     icon: Phone,
     title: "Scannez à l’entrée",
-    desc: "Le jour J, ouvrez l’app Masturi et scannez les QR Codes. Fini les listes papier.",
+    desc: "Le jour J, ouvrez l’app Matsuri et scannez les QR Codes. Fini les listes papier.",
   },
 ];
 
@@ -135,10 +135,10 @@ const compare = [
 const faqs = [
   {
     q: "Est-ce que je peux vendre des billets payants ?",
-    r: "Oui, Masturi intègre un système de paiement sécurisé. Vous fixez le prix de vos billets et encaissez directement.",
+    r: "Oui, Matsuri intègre un système de paiement sécurisé. Vous fixez le prix de vos billets et encaissez directement.",
   },
   {
-    q: "Mes participants ont-ils besoin de l’app Masturi ?",
+    q: "Mes participants ont-ils besoin de l’app Matsuri ?",
     r: "Non, ils reçoivent leur billet par email avec un QR Code. Ils le présentent sur leur smartphone ou l’impriment.",
   },
   {
@@ -196,7 +196,7 @@ export default async function HomePage() {
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="m-drift absolute -right-36 -top-40 size-[520px] rounded-full bg-brand-100/70 blur-3xl" />
           <div className="m-drift absolute -bottom-48 -left-40 size-[440px] rounded-full bg-sky-100/70 blur-3xl [animation-delay:-8s]" />
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f01f_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f01f_1px,transparent_1px)] bg-[size:48px_48px]" />
+          <div className="full-grid-subtle absolute inset-0" />
         </div>
 
         <Container className="relative grid items-center gap-12 pb-16 pt-12 sm:pb-24 sm:pt-20 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10">
@@ -269,7 +269,7 @@ export default async function HomePage() {
               </span>
               <p className="text-left text-xs leading-5 text-slate-500">
                 <span className="block font-semibold text-slate-800">Une communauté en croissance</span>
-                {platform.organizations.toLocaleString("fr-FR")} organisateurs sur Masturi
+                {platform.organizations.toLocaleString("fr-FR")} organisateurs sur Evenn
               </p>
             </div>
           </div>
@@ -348,7 +348,7 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      {/* ===== AVANT / AVEC MASTURI ===== */}
+      {/* ===== AVANT / AVEC EVENN ===== */}
       <section id="probleme" className="border-y border-slate-200/70 bg-white py-16 sm:py-24">
         <Container className="max-w-5xl">
           <SectionHeading
@@ -359,8 +359,8 @@ export default async function HomePage() {
           <Reveal className="overflow-hidden rounded-3xl border border-slate-200/80 bg-surface">
             <div className="hidden grid-cols-[160px_1fr_1fr] gap-4 border-b border-slate-200/80 bg-white px-6 py-4 text-sm font-bold sm:grid">
               <span />
-              <span className="text-slate-500">Sans Masturi</span>
-              <span className="text-brand-700">Avec Masturi</span>
+              <span className="text-slate-500">Sans Matsuri</span>
+              <span className="text-brand-700">Avec Matsuri</span>
             </div>
             {compare.map((row, i) => (
               <Reveal
@@ -370,7 +370,7 @@ export default async function HomePage() {
               >
                 <span className="text-sm font-bold text-slate-950">{row.label}</span>
                 <span className="flex items-start gap-2 text-sm text-slate-500">
-                  <X aria-hidden className="mt-0.5 size-4 shrink-0 text-slate-400" />
+                  <X aria-hidden className="mt-0.5 size-4 shrink-0 text-slate-500" />
                   {row.before}
                 </span>
                 <span className="flex items-start gap-2 text-sm font-medium text-slate-800">
@@ -389,7 +389,7 @@ export default async function HomePage() {
           <SectionHeading
             eyebrow="Simple du début à la fin"
             title="Prêt en trois étapes"
-            description="De la création au jour J, Masturi vous accompagne."
+            description="De la création au jour J, Matsuri vous accompagne."
           />
           <ol className="grid gap-4 md:grid-cols-3">
             {steps.map((step, i) => (
@@ -399,7 +399,7 @@ export default async function HomePage() {
                     <span className="flex size-12 items-center justify-center rounded-2xl bg-brand-600 text-white">
                       <step.icon aria-hidden className="size-6" strokeWidth={1.75} />
                     </span>
-                    <span className="text-sm font-semibold text-slate-400">Étape {i + 1}</span>
+                    <span className="text-sm font-semibold text-slate-500">Étape {i + 1}</span>
                   </div>
                   <h3 className="mt-5 text-lg font-bold text-slate-950">{step.title}</h3>
                   <p className="mt-2 text-sm leading-6 text-slate-500">{step.desc}</p>
@@ -481,7 +481,7 @@ export default async function HomePage() {
             <SectionHeading
               eyebrow="À ne pas manquer"
               title="Les prochains événements"
-              description="Découvrez ce qui se prépare sur Masturi et réservez votre place."
+              description="Découvrez ce qui se prépare sur Matsuri et réservez votre place."
             />
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {featuredEvents.map((event, index) => (
@@ -521,7 +521,7 @@ export default async function HomePage() {
                     </span>
                     <Plus
                       aria-hidden
-                      className="size-4 shrink-0 text-slate-400 transition duration-300 group-open:rotate-45"
+                      className="size-4 shrink-0 text-slate-500 transition duration-300 group-open:rotate-45"
                     />
                   </summary>
                   <p className="m-open mt-3 pl-7 text-sm leading-6 text-slate-500">{faq.r}</p>
@@ -550,13 +550,13 @@ export default async function HomePage() {
           <div className="relative overflow-hidden rounded-t-[2rem] bg-brand-600 px-7 py-12 text-white sm:px-12 sm:py-16 md:rounded-l-[2rem] md:rounded-tr-none">
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)] bg-[size:40px_40px]"
+              className="full-grid-accent pointer-events-none absolute inset-0"
             />
             <div className="relative max-w-lg">
               <h2 className="text-balance text-3xl font-bold leading-[1.1] tracking-tight sm:text-4xl md:text-[2.75rem]">
                 Votre prochain événement mérite une vraie billetterie.
               </h2>
-              <p className="mt-5 text-base leading-7 text-brand-50/90">
+              <p className="mt-5 text-base leading-7 text-[var(--on-accent)]/90">
                 Créez votre page en 5 minutes, vendez vos billets en ligne et validez les entrées
                 avec votre téléphone.
               </p>
@@ -671,15 +671,15 @@ function HeroMockup({
 
   return (
     <div className="relative mx-auto w-full text-left">
-      <div className="rounded-3xl border border-slate-200/80 bg-white/95 p-4 shadow-[0_32px_90px_-40px_rgba(15,23,42,0.3)] backdrop-blur sm:p-6">
+      <div className="rounded-3xl border border-slate-200/80 bg-white/95 p-4 shadow-pop backdrop-blur sm:p-6">
         {/* barre de fenêtre */}
         <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-4">
           <div className="flex min-w-0 items-center gap-1.5">
-            <span className="size-2.5 rounded-full bg-rose-300" />
-            <span className="size-2.5 rounded-full bg-amber-300" />
-            <span className="size-2.5 rounded-full bg-emerald-300" />
-            <span className="ml-2 truncate rounded-md bg-surface px-3 py-1 text-[10px] text-slate-400 sm:text-xs">
-              masturi.app/tableau-de-bord
+            <span className="size-2.5 rounded-full bg-[var(--accent-soft)]" />
+            <span className="size-2.5 rounded-full bg-[var(--accent)]" />
+            <span className="size-2.5 rounded-full bg-[var(--accent-hover)]" />
+            <span className="ml-2 truncate rounded-md bg-surface px-3 py-1 text-[10px] text-slate-500 sm:text-xs">
+              evenn.app/tableau-de-bord
             </span>
           </div>
           <span className="hidden shrink-0 items-center gap-1.5 text-xs font-medium text-emerald-700 sm:flex">
@@ -762,7 +762,7 @@ function HeroMockup({
         className="m-float absolute -bottom-5 -right-3 hidden items-center gap-3 rounded-2xl border border-slate-200/80 bg-white px-4 py-3 shadow-pop sm:flex"
         style={d(-3000)}
       >
-        <span className="flex size-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+        <span className="flex size-9 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
           <Ticket aria-hidden className="size-5" />
         </span>
         <div>
@@ -811,7 +811,7 @@ function BentoVisual({ kind }: { kind: string }) {
         </div>
         <div className="flex items-center justify-between">
           <span className="text-slate-500">Code promo</span>
-          <span className="font-bold text-emerald-600">-10 %</span>
+          <span className="font-bold text-brand-600">-10 %</span>
         </div>
         <div className="flex items-center justify-between border-t border-slate-200 pt-2">
           <span className="font-bold text-slate-950">Total</span>
@@ -853,7 +853,7 @@ function PhoneMockup({
           {/* ligne de scan */}
           <span
             aria-hidden
-            className="m-scan absolute inset-x-6 top-[12%] h-0.5 rounded-full bg-brand-400 shadow-[0_0_14px_3px_rgba(96,165,250,0.7)] motion-reduce:hidden"
+            className="m-scan absolute inset-x-6 top-[12%] h-0.5 rounded-full bg-brand-400 shadow-[var(--shadow-glow)] motion-reduce:hidden"
           />
         </div>
         <div className="m-pop mt-4 flex items-center gap-3 rounded-xl bg-emerald-50 p-3">

@@ -13,7 +13,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ArrowRight, Scan, Ticket, TrendingUp, Users, Wallet } from "lucide-react";
+import { ArrowRight, Scan, Ticket, TrendingUp, Trophy, Users, Vote, Wallet } from "lucide-react";
 
 import DashboardShell from "@/src/components/dashboard/DashboardShell";
 import type { AnalyticsData } from "@/lib/actions/dashboard/get-dashboard-data";
@@ -34,6 +34,11 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
     ventes: item.sales,
   }));
 
+  const voteSalesData = data.dailyVotes.map((item) => ({
+    day: dayLabel(item.date),
+    votes: item.votes,
+  }));
+
   const ticketTypes = data.ticketTypes.filter((item) => item.sold > 0);
 
   const metrics = [
@@ -43,10 +48,15 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
     { label: "Scans enregistrés", value: data.scans.toLocaleString("fr-FR"), icon: Scan },
   ];
 
+  const voteMetrics = [
+    { label: "Votes valides", value: data.votes, icon: Vote },
+    { label: "Votes payants", value: data.paidVotes, icon: Wallet },
+  ];
+
   return (
     <DashboardShell
       title="Analytics"
-      description="Performance réelle de vos événements et de vos ventes."
+      description="Performance de vos événements, ventes et concours."
     >
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {metrics.map(({ label, value, icon: Icon }) => (
@@ -255,6 +265,199 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
             </table>
           </div>
         )}
+      </section>
+
+      <section className="space-y-6">
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">Analytics des votes</h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Votes valides et paiements de vos concours uniquement.
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {voteMetrics.map(({ label, value, icon: Icon }) => (
+            <div
+              key={label}
+              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/50"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm text-slate-500">{label}</p>
+                  <p className="mt-2 truncate text-2xl font-bold tracking-tight text-slate-900">
+                    {value.toLocaleString("fr-FR")}
+                  </p>
+                </div>
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                  <Icon className="size-5" />
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-200/50">
+          <div className="border-b border-slate-100 px-5 py-5">
+            <h3 className="font-semibold text-slate-900">Paiements des votes</h3>
+            <p className="mt-1 text-sm text-slate-500">
+              Montants encaissés sur les commandes payées, par devise.
+            </p>
+          </div>
+          {data.voteRevenue.length === 0 ? (
+            <div className="px-5 py-10 text-center text-sm text-slate-500">
+              Aucun paiement de vote enregistré.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[560px] text-sm">
+                <thead className="border-b border-slate-100 bg-slate-50/80">
+                  <tr className="text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    <th className="px-5 py-3">Devise</th>
+                    <th className="px-5 py-3">Montant encaissé</th>
+                    <th className="px-5 py-3">Commission plateforme</th>
+                    <th className="px-5 py-3">Commandes payées</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {data.voteRevenue.map((item) => (
+                    <tr key={item.currency}>
+                      <td className="px-5 py-4 font-medium text-slate-800">{item.currency}</td>
+                      <td className="px-5 py-4 text-slate-600">
+                        {item.gross.toLocaleString("fr-FR")}
+                      </td>
+                      <td className="px-5 py-4 text-slate-600">
+                        {item.commission.toLocaleString("fr-FR")}
+                      </td>
+                      <td className="px-5 py-4 text-slate-600">
+                        {item.orders.toLocaleString("fr-FR")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/50">
+            <div className="mb-5">
+              <h3 className="font-semibold text-slate-900">Votes des 7 derniers jours</h3>
+              <p className="mt-1 text-sm text-slate-500">
+                Votes valides enregistrés par jour.
+              </p>
+            </div>
+            <ResponsiveContainer width="100%" height={280}>
+              <AreaChart data={voteSalesData} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="voteAnalyticsFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#0EA5E9" stopOpacity={0.25} />
+                    <stop offset="100%" stopColor="#0EA5E9" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke="#E2E8F0" strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  dataKey="day"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#64748B", fontSize: 12 }}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  allowDecimals={false}
+                  tick={{ fill: "#64748B", fontSize: 12 }}
+                />
+                <Tooltip
+                  contentStyle={{ border: "1px solid #E2E8F0", borderRadius: 8 }}
+                  formatter={(value) => [`${value} vote(s)`, "Votes"]}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="votes"
+                  stroke="#0EA5E9"
+                  strokeWidth={2.5}
+                  fill="url(#voteAnalyticsFill)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-200/50">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-5">
+              <div>
+                <h3 className="font-semibold text-slate-900">Concours les plus votés</h3>
+                <p className="mt-1 text-sm text-slate-500">Classement par votes valides.</p>
+              </div>
+              <Trophy className="size-5 shrink-0 text-brand-600" />
+            </div>
+            {data.topContests.length === 0 ? (
+              <p className="px-5 py-10 text-center text-sm text-slate-500">
+                Aucun vote enregistré pour vos concours.
+              </p>
+            ) : (
+              <ol className="divide-y divide-slate-100">
+                {data.topContests.map((contest, index) => (
+                  <li
+                    key={contest.id}
+                    className="flex items-center justify-between gap-3 px-5 py-4"
+                  >
+                    <span className="flex min-w-0 items-center gap-3">
+                      <span className="text-sm font-semibold text-slate-400">
+                        {index + 1}.
+                      </span>
+                      <span className="truncate text-sm font-medium text-slate-800">
+                        {contest.title}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-sm font-semibold text-slate-700">
+                      {contest.votes.toLocaleString("fr-FR")}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-200/50">
+          <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-5">
+            <div>
+              <h3 className="font-semibold text-slate-900">Candidats les plus votés</h3>
+              <p className="mt-1 text-sm text-slate-500">Classement par votes valides reçus.</p>
+            </div>
+            <TrendingUp className="size-5 shrink-0 text-brand-600" />
+          </div>
+          {data.topCandidates.length === 0 ? (
+            <p className="px-5 py-10 text-center text-sm text-slate-500">
+              Aucun vote enregistré pour vos candidats.
+            </p>
+          ) : (
+            <ol className="grid gap-x-6 divide-y divide-slate-100 px-5 sm:grid-cols-2 sm:divide-y-0">
+              {data.topCandidates.map((candidate, index) => (
+                <li
+                  key={candidate.id}
+                  className="flex items-center justify-between gap-3 border-b border-slate-100 py-4 last:border-b-0 sm:odd:border-r sm:odd:pr-5"
+                >
+                  <span className="flex min-w-0 items-center gap-3">
+                    <span className="text-sm font-semibold text-slate-400">{index + 1}.</span>
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-medium text-slate-800">
+                        {candidate.name}
+                      </span>
+                      <span className="block truncate text-xs text-slate-500">
+                        {candidate.contestTitle}
+                      </span>
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-sm font-semibold text-slate-700">
+                    {candidate.votes.toLocaleString("fr-FR")}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
       </section>
     </DashboardShell>
   );

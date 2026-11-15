@@ -51,7 +51,7 @@ function Row({
 }) {
   return (
     <div className="flex flex-col justify-between gap-1.5 py-4 sm:flex-row sm:items-center sm:gap-4">
-      <dt className="shrink-0 text-xs font-semibold uppercase tracking-wide text-slate-400">
+      <dt className="shrink-0 text-xs font-semibold uppercase tracking-wide text-slate-500">
         {label}
       </dt>
       <dd className="min-w-0 text-sm text-slate-900 sm:text-right">{children}</dd>
@@ -93,13 +93,13 @@ function Step({
             ? "bg-emerald-100 text-emerald-700 ring-emerald-50"
             : active
               ? "bg-brand-100 text-brand-600 ring-brand-50"
-              : "bg-slate-100 text-slate-400 ring-slate-50",
+              : "bg-slate-100 text-slate-500 ring-slate-50",
         )}
       >
         {icon}
       </span>
       <div className="min-w-0 pt-1">
-        <p className={cn("text-sm font-bold", done || active ? "text-slate-900" : "text-slate-400")}>
+        <p className={cn("text-sm font-bold", done || active ? "text-slate-900" : "text-slate-500")}>
           {title}
         </p>
         <p className="mt-0.5 text-xs leading-5 text-slate-500">{description}</p>
@@ -381,7 +381,7 @@ export default function VoteCheckoutClient({
               </Row>
             </dl>
 
-            <p className="border-t border-slate-100 px-6 py-4 text-xs text-slate-400 sm:px-8">
+            <p className="border-t border-slate-100 px-6 py-4 text-xs text-slate-500 sm:px-8">
               Commande créée le {formatVoteDateTime(order.createdAt)}
             </p>
 

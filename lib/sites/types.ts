@@ -7,6 +7,7 @@ export type SiteTemplateOption = {
   eventType: SiteEventType;
   description: string;
   layout: SiteTemplateLayout;
+  variant: string;
   palette: SitePalette;
   sections: SiteSectionTemplate[];
 };

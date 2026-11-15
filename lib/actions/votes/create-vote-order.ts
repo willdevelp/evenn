@@ -6,26 +6,19 @@ import { z } from "zod";
 import { getSession } from "@/lib/auth-session";
 import { withTransaction } from "@/lib/db";
 import { getProvider } from "@/lib/payments/providers";
-import { MAX_PACKS_PER_ORDER, MAX_VOTES_PER_ORDER, isContestOpenForVotes } from "@/lib/votes";
+import { calculatePlatformCommission } from "@/lib/commission";
+import { MAX_VOTES_PER_ORDER, isContestOpenForVotes } from "@/lib/votes";
 import type { Enums } from "@/types/supabase";
 
 const voteOrderInputSchema = z
   .object({
     contestId: z.string().uuid("Concours invalide"),
     candidateId: z.string().uuid("Candidat invalide"),
-    packId: z.string().uuid("Pack de votes invalide").nullable().optional(),
-    packQuantity: z.coerce
-      .number()
-      .int("Quantité de packs invalide")
-      .min(1, "Sélectionnez au moins un pack")
-      .max(MAX_PACKS_PER_ORDER, "Trop de packs pour une seule commande")
-      .optional(),
     votesCount: z.coerce
       .number()
       .int("Le nombre de votes doit être un entier")
       .min(1, "Sélectionnez au moins un vote")
-      .max(MAX_VOTES_PER_ORDER, "Trop de votes pour une seule commande")
-      .optional(),
+      .max(MAX_VOTES_PER_ORDER, "Trop de votes pour une seule commande"),
     buyerName: z
       .string()
       .trim()
@@ -84,18 +77,12 @@ type CandidateRow = {
   category_id: string;
 };
 
-type PackRow = {
-  id: string;
-  votes_count: number;
-  price_amount: string;
-};
-
 /**
  * Crée une commande de votes `pending`.
  *
  * Le montant et le nombre de votes sont TOUJOURS recalculés côté serveur à
- * partir du concours, du candidat et du pack en base : le client ne peut pas
- * les falsifier. Aucun vote n'est crédité ici ; ils le seront uniquement par
+ * partir du prix unitaire du concours : le client ne peut pas le falsifier.
+ * Aucun vote n'est crédité ici ; ils le seront uniquement par
  * `fulfillPaidOrder`, après vérification de la signature et du montant du
  * webhook de paiement.
  */
@@ -153,32 +140,9 @@ export async function createVoteOrder(
       throw new Error("Ce candidat n'est pas disponible pour ce concours.");
     }
 
-    let votesCount: number;
-    let amount: number;
-    let packId: string | null = null;
-
-    if (values.packId) {
-      const { rows: packs } = await client.query<PackRow>(
-        `SELECT id, votes_count, price_amount
-           FROM vote_packs
-          WHERE id = $1 AND contest_id = $2 AND is_active = TRUE
-          FOR SHARE`,
-        [values.packId, contest.id],
-      );
-      const pack = packs[0];
-      if (!pack) throw new Error("Ce pack de votes n'est plus disponible.");
-
-      const packQuantity = values.packQuantity ?? 1;
-      votesCount = pack.votes_count * packQuantity;
-      amount = Number(pack.price_amount) * packQuantity;
-      packId = pack.id;
-    } else {
-      if (!values.votesCount) {
-        throw new Error("Indiquez le nombre de votes souhaité.");
-      }
-      votesCount = values.votesCount;
-      amount = Number(contest.price_per_vote) * votesCount;
-    }
+    const votesCount = values.votesCount;
+    const amount = Number(contest.price_per_vote) * votesCount;
+    const commission = calculatePlatformCommission(amount);
 
     if (votesCount < 1 || votesCount > MAX_VOTES_PER_ORDER) {
       throw new Error("Nombre de votes invalide.");
@@ -194,7 +158,7 @@ export async function createVoteOrder(
           subtotal_amount, discount_amount, fee_amount,
           platform_commission_amount, total_amount, metadata
        )
-       VALUES ($1, 'vote', 'pending', $2, $3, $4, $5, $6, $7, 0, 0, 0, $7, $8::jsonb)
+       VALUES ($1, 'vote', 'pending', $2, $3, $4, $5, $6, $7, 0, 0, $8, $7, $9::jsonb)
        RETURNING id, order_number`,
       [
         contest.organization_id,
@@ -204,10 +168,10 @@ export async function createVoteOrder(
         values.buyerPhone,
         contest.currency,
         amount,
+        commission,
         JSON.stringify({
           contest_id: contest.id,
           candidate_id: candidate.id,
-          pack_id: packId,
           votes_count: votesCount,
         }),
       ],
@@ -218,7 +182,7 @@ export async function createVoteOrder(
     await client.query(
       `INSERT INTO vote_purchases (order_id, contest_id, candidate_id, pack_id, votes_count, amount)
        VALUES ($1, $2, $3, $4, $5, $6)`,
-      [order.id, contest.id, candidate.id, packId, votesCount, amount],
+      [order.id, contest.id, candidate.id, null, votesCount, amount],
     );
 
     const paymentReference = `VOTE-${randomUUID()}`;

@@ -68,11 +68,11 @@ export default function EventCard({
 
         <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500">
           <span className="flex items-center gap-1.5">
-            <MapPin aria-hidden className="size-3.5 text-slate-400" />{" "}
+            <MapPin aria-hidden className="size-3.5 text-slate-500" />{" "}
             {formatEventPlace(event.venue, event.city)}
           </span>
           <span className="flex items-center gap-1.5">
-            <CalendarDays aria-hidden className="size-3.5 text-slate-400" />{" "}
+            <CalendarDays aria-hidden className="size-3.5 text-slate-500" />{" "}
             {formatEventDateShort(event.date)}
           </span>
         </p>
@@ -80,7 +80,7 @@ export default function EventCard({
         <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
           {event.ticketsSold > 0 ? (
             <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-600">
-              <Users aria-hidden className="size-3.5 text-slate-400" />
+              <Users aria-hidden className="size-3.5 text-slate-500" />
               {event.ticketsSold.toLocaleString("fr-FR")} billet
               {event.ticketsSold > 1 ? "s" : ""} vendu{event.ticketsSold > 1 ? "s" : ""}
             </span>
@@ -88,7 +88,7 @@ export default function EventCard({
             <span
               className={cn(
                 "text-xs font-semibold",
-                event.date ? "text-emerald-600" : "text-slate-400",
+                event.date ? "text-brand-600" : "text-slate-500",
               )}
             >
               {event.date ? "Billets disponibles" : "Date à confirmer"}

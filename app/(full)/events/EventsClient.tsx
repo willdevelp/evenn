@@ -110,7 +110,7 @@ export default function EventsClient({ events }: { events: EventListItem[] }) {
       <section className="relative isolate overflow-hidden bg-brand-600 text-white">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)] bg-[size:40px_40px]"
+          className="full-grid-accent pointer-events-none absolute inset-0"
         />
         <div
           aria-hidden
@@ -122,7 +122,7 @@ export default function EventsClient({ events }: { events: EventListItem[] }) {
             <h1 className="max-w-2xl text-balance text-4xl font-bold leading-[1.06] tracking-tight sm:text-5xl lg:text-6xl">
               Vos prochaines sorties commencent ici.
             </h1>
-            <p className="mt-5 max-w-xl text-base leading-7 text-brand-50/90 sm:text-lg sm:leading-8">
+            <p className="mt-5 max-w-xl text-base leading-7 text-[var(--on-accent)]/90 sm:text-lg sm:leading-8">
               Concerts, conférences, festivals et ateliers : trouvez l’événement qui vous
               ressemble et réservez votre place en quelques clics.
             </p>
@@ -285,7 +285,7 @@ export default function EventsClient({ events }: { events: EventListItem[] }) {
                 {filtered.length > 1 ? "s" : ""} à découvrir
               </h2>
               <label className="flex w-full items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 transition focus-within:border-brand-600 focus-within:ring-4 focus-within:ring-brand-600/10 sm:w-60">
-                <span className="shrink-0 text-xs font-medium text-slate-400">Trier</span>
+                <span className="shrink-0 text-xs font-medium text-slate-500">Trier</span>
                 <select
                   className={selectClass}
                   aria-label="Trier les événements"
@@ -325,7 +325,7 @@ export default function EventsClient({ events }: { events: EventListItem[] }) {
           <div className="relative overflow-hidden rounded-t-[2rem] bg-brand-600 px-7 py-11 text-white sm:px-12 sm:py-14 md:rounded-l-[2rem] md:rounded-tr-none">
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)] bg-[size:40px_40px]"
+              className="full-grid-accent pointer-events-none absolute inset-0"
             />
             <div className="relative max-w-lg">
               <h2
@@ -334,7 +334,7 @@ export default function EventsClient({ events }: { events: EventListItem[] }) {
               >
                 Vous organisez un événement ?
               </h2>
-              <p className="mt-4 text-sm leading-7 text-brand-50/90 sm:text-base">
+              <p className="mt-4 text-sm leading-7 text-[var(--on-accent)]/90 sm:text-base">
                 Créez votre événement en quelques minutes, vendez vos billets et contrôlez les
                 accès par QR Code.
               </p>

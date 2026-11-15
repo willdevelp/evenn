@@ -96,6 +96,10 @@ export const auth = betterAuth({
    * accessTokenExpiresAt / refreshTokenExpiresAt sont des timestamptz -> Date.
    */
   account: {
+    accountLinking: {
+			enabled: true,
+			trustedProviders: ["google"], // ou ["google"] selon vos besoins
+		},
     fields: {
       accountId: "accountId",
       providerId: "providerId",

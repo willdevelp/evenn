@@ -135,6 +135,7 @@ export async function getEvent(): Promise<DashboardEvent[]> {
         SELECT starts_at, ends_at
         FROM event_dates
         WHERE event_id = e.id
+          AND COALESCE(ends_at, starts_at) > now()
         ORDER BY starts_at ASC
         LIMIT 1
       ) d ON TRUE
@@ -149,6 +150,10 @@ export async function getEvent(): Promise<DashboardEvent[]> {
         e.deleted_at IS NULL
         AND e.status::text = 'published'
         AND e.visibility::text = 'public'
+        AND (
+          d.starts_at IS NOT NULL
+          OR NOT EXISTS (SELECT 1 FROM event_dates ed WHERE ed.event_id = e.id)
+        )
       ORDER BY
         COALESCE(d.starts_at, e.created_at) DESC`
   );

@@ -27,7 +27,7 @@ export default function FaqItem({ question, answer }: { question: string; answer
         <ChevronDown
           aria-hidden
           className={cn(
-            "size-4 shrink-0 text-slate-400 transition-transform duration-300",
+            "size-4 shrink-0 text-slate-500 transition-transform duration-300",
             open && "rotate-180",
           )}
         />

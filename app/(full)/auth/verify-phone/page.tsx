@@ -105,7 +105,7 @@ function VerifyPhoneForm() {
             aria-describedby="code-hint"
             className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white py-3 text-center text-2xl font-semibold tracking-[0.5em] text-slate-900 outline-none transition placeholder:text-slate-300 focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10"
           />
-          <p id="code-hint" className="mt-1.5 text-xs text-slate-400">
+          <p id="code-hint" className="mt-1.5 text-xs text-slate-500">
             Pensez à désactiver la saisie automatique si le code est recollé avec des espaces.
           </p>
         </div>

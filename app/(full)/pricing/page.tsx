@@ -143,9 +143,9 @@ export default async function PricingPage() {
         <div className="grid items-stretch gap-6 md:grid-cols-2">
           {/* Règle de commission (base de données) */}
           <div className="relative flex flex-col overflow-hidden rounded-2xl bg-brand-600 p-8 text-white shadow-card-hover">
-            <h2 className="text-lg font-bold">Commission billetterie</h2>
-            <p className="mt-1.5 text-sm leading-6 text-brand-100">
-              Règle appliquée à chaque commande de billets.
+            <h2 className="text-lg font-bold">Commission sur billets et votes</h2>
+            <p className="mt-1.5 text-sm leading-6 text-[var(--on-accent)]/80">
+              10 % sont déduits du montant reversé à l&apos;organisateur sur chaque vente de billets ou de votes.
             </p>
 
             {rule ? (
@@ -154,7 +154,7 @@ export default async function PricingPage() {
                   <span className="text-5xl font-bold tracking-tight">
                     {percent.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} %
                   </span>
-                  <span className="pb-1 text-sm text-brand-100">
+                  <span className="pb-1 text-sm text-[var(--on-accent)]/80">
                     {fixedAmount > 0 ? `+ ${formatAmount(fixedAmount)} / commande` : "du montant"}
                   </span>
                 </div>
@@ -162,14 +162,14 @@ export default async function PricingPage() {
                 <dl className="mt-7 flex-1 space-y-3 border-t border-white/20 pt-5 text-sm">
                   {details.map((detail) => (
                     <div key={detail.label} className="flex justify-between gap-4">
-                      <dt className="text-brand-100">{detail.label}</dt>
+                      <dt className="text-[var(--on-accent)]/80">{detail.label}</dt>
                       <dd className="text-right font-semibold">{detail.value}</dd>
                     </div>
                   ))}
                 </dl>
               </>
             ) : (
-              <p className="mt-6 flex-1 text-sm leading-7 text-brand-100">
+              <p className="mt-6 flex-1 text-sm leading-7 text-[var(--on-accent)]/80">
                 La tarification de la billetterie n’est pas encore configurée. Contactez notre
                 équipe pour connaître les conditions applicables à votre événement.
               </p>
@@ -209,7 +209,7 @@ export default async function PricingPage() {
                 </li>
               ))}
             </ul>
-            <p className="mt-6 flex items-start gap-2 text-xs leading-5 text-slate-400">
+            <p className="mt-6 flex items-start gap-2 text-xs leading-5 text-slate-500">
               <BadgeCheck aria-hidden className="mt-0.5 size-3.5 shrink-0 text-brand-500" />
               Sans abonnement : la plateforme ne se rémunère que sur les ventes.
             </p>
@@ -280,7 +280,7 @@ export default async function PricingPage() {
             <h2 className="text-balance text-2xl font-bold tracking-tight sm:text-3xl">
               Prêt à organiser votre prochain événement ?
             </h2>
-            <p className="mt-3 text-sm leading-7 text-brand-100 sm:text-base">
+            <p className="mt-3 text-sm leading-7 text-[var(--on-accent)]/80 sm:text-base">
               Créez votre événement en quelques minutes, sans engagement ni frais fixe.
             </p>
             <Link

@@ -13,13 +13,7 @@ export const metadata = {
 
 export default async function EventsPage() {
   const storedEvents = await getEvent();
-
-  const startOfToday = new Date();
-  startOfToday.setHours(0, 0, 0, 0);
-
-  const events: EventListItem[] = storedEvents
-    .filter((event) => !event.date || new Date(event.date).getTime() >= startOfToday.getTime())
-    .map((event) => ({
+  const events: EventListItem[] = storedEvents.map((event) => ({
       id: event.id,
       title: event.title,
       category: event.category,

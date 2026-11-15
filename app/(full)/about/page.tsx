@@ -21,9 +21,9 @@ import Header from "@/src/components/ui/header";
 import Footer from "@/src/components/ui/footer";
 
 export const metadata = {
-  title: "À propos | Masturi",
+  title: "À propos | Evenn",
   description:
-    "Masturi connecte les organisateurs d’événements à leur public avec une billetterie en ligne, des QR Codes et un contrôle d’accès simple.",
+    "Evenn connecte les organisateurs d’événements à leur public avec une billetterie en ligne, des QR Codes et un contrôle d’accès simple.",
 };
 
 export const dynamic = "force-dynamic";
@@ -66,7 +66,7 @@ const VALUES = [
 
 const FAQ = [
   {
-    question: "Masturi est-il gratuit pour les organisateurs ?",
+    question: "Evenn est-il gratuit pour les organisateurs ?",
     answer:
       "La création d’un compte et la mise en ligne d’un événement sont gratuites. Une commission n’est prélevée que sur les billets effectivement vendus, selon la règle tarifaire affichée sur la page Tarifs.",
   },
@@ -105,7 +105,7 @@ export default async function AboutPage() {
       <section className="relative isolate overflow-hidden bg-brand-600 text-white">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)] bg-[size:40px_40px]"
+          className="full-grid-accent pointer-events-none absolute inset-0"
         />
         {/* 祭 : « fête, festival » */}
         <span
@@ -120,8 +120,8 @@ export default async function AboutPage() {
             <h1 className="text-balance text-4xl font-bold leading-[1.06] tracking-tight sm:text-5xl lg:text-6xl">
               Les plus beaux moments se vivent ensemble.
             </h1>
-            <p className="mt-5 max-w-xl text-base leading-7 text-brand-50/90 sm:text-lg sm:leading-8">
-              Masturi réunit les organisateurs et leur public pour rendre chaque événement
+            <p className="mt-5 max-w-xl text-base leading-7 text-[var(--on-accent)]/90 sm:text-lg sm:leading-8">
+              Evenn réunit les organisateurs et leur public pour rendre chaque événement
               plus simple à créer, à découvrir et à vivre.
             </p>
             <Link
@@ -154,13 +154,13 @@ export default async function AboutPage() {
           </h2>
           <div className="space-y-4 text-sm leading-7 text-slate-600 sm:text-base sm:leading-8">
             <p>
-              <strong className="font-semibold text-slate-950">Masturi</strong> est une
+              <strong className="font-semibold text-slate-950">Evenn</strong> est une
               plateforme dédiée à la découverte, la gestion et la réservation d’événements
               uniques.
             </p>
             <p>
               Que vous soyez amateur de musique, passionné de culture ou professionnel à la
-              recherche d’un salon ou d’une conférence, Masturi vous permet de trouver des
+              recherche d’un salon ou d’une conférence, Evenn vous permet de trouver des
               événements adaptés à vos envies, partout.
             </p>
             <p>
@@ -169,7 +169,7 @@ export default async function AboutPage() {
               intuitive, la réservation n’a jamais été aussi simple.
             </p>
             <p className="border-l-2 border-brand-600 pl-4 font-medium text-slate-950">
-              Merci de faire partie de l’aventure Masturi. Ensemble, rendons chaque moment
+              Merci de faire partie de l’aventure Evenn. Ensemble, rendons chaque moment
               inoubliable.
             </p>
           </div>
@@ -288,7 +288,7 @@ export default async function AboutPage() {
           <div className="relative overflow-hidden rounded-t-[2rem] bg-brand-600 px-7 py-11 text-white sm:px-12 sm:py-14 md:rounded-l-[2rem] md:rounded-tr-none">
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)] bg-[size:40px_40px]"
+              className="full-grid-accent pointer-events-none absolute inset-0"
             />
             <div className="relative max-w-lg">
               <h2
@@ -297,8 +297,8 @@ export default async function AboutPage() {
               >
                 Prêt à vivre des expériences uniques ?
               </h2>
-              <p className="mt-4 text-sm leading-7 text-brand-50/90 sm:text-base">
-                Rejoignez Masturi dès maintenant et découvrez des événements qui vous
+              <p className="mt-4 text-sm leading-7 text-[var(--on-accent)]/90 sm:text-base">
+                Rejoignez Evenn dès maintenant et découvrez des événements qui vous
                 correspondent.
               </p>
             </div>
@@ -352,7 +352,7 @@ function SectionHeading({
   );
 }
 
-/** Lanterne japonaise (chōchin) : l'icône de Masturi, en couleur courante. */
+/** Lanterne japonaise (chōchin) : l'icône de Evenn, en couleur courante. */
 function Lantern({ className }: { className?: string }) {
   const clipId = useId();
   const body = "M21 11H43C53 21 53 43 43 53H21C11 43 11 21 21 11Z";

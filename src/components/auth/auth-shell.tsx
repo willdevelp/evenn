@@ -40,7 +40,7 @@ export default function AuthShell({
       <aside className="relative isolate hidden overflow-hidden bg-brand-600 text-white lg:block">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)] bg-[size:40px_40px]"
+          className="full-grid-accent pointer-events-none absolute inset-0"
         />
         {/* 祭 : « fête, festival » */}
         <span
@@ -56,7 +56,7 @@ export default function AuthShell({
             className="flex w-fit items-center gap-3 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white/50"
           >
             <Lantern className="size-9 text-white" />
-            <span className="text-lg font-medium uppercase tracking-[0.22em]">Masturi</span>
+            <span className="text-lg font-medium uppercase tracking-[0.22em]">Evenn</span>
           </Link>
 
           <div className="m-rise max-w-md">
@@ -76,7 +76,7 @@ export default function AuthShell({
             </ul>
           </div>
 
-          <p className="text-sm text-brand-100">La billetterie pensée pour vos événements.</p>
+          <p className="text-sm text-[var(--on-accent)]/80">La billetterie pensée pour vos événements.</p>
         </div>
       </aside>
 
@@ -92,7 +92,7 @@ export default function AuthShell({
           <Link href="/" className="mb-6 flex w-fit items-center gap-2.5 text-brand-600 lg:hidden">
             <Lantern className="size-8" />
             <span className="text-base font-medium uppercase tracking-[0.22em] text-slate-950">
-              Masturi
+              Evenn
             </span>
           </Link>
 
@@ -133,7 +133,7 @@ export function AuthDivider() {
   return (
     <div className="my-6 flex items-center gap-4" aria-hidden>
       <span className="flex-1 border-t-2 border-dashed border-brand-200" />
-      <span className="text-xs font-medium text-slate-400">OU</span>
+      <span className="text-xs font-medium text-slate-500">OU</span>
       <span className="flex-1 border-t-2 border-dashed border-brand-200" />
     </div>
   );
@@ -168,14 +168,14 @@ export const authInputClass =
   "w-full rounded-xl border border-slate-200 bg-surface py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-brand-200 focus:border-brand-600 focus:bg-white focus:ring-4 focus:ring-brand-600/10 aria-[invalid=true]:border-rose-400 aria-[invalid=true]:ring-4 aria-[invalid=true]:ring-rose-100";
 
 export const authFieldIcon =
-  "pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-400";
+  "pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-500";
 
 export const authFieldError = "mt-1.5 text-xs font-medium text-rose-600";
 
 export const authLabelClass = "block text-sm font-semibold text-slate-800";
 
 /* ------------------------------------------------------------------ */
-/* Lanterne japonaise : l'icône de Masturi                             */
+/* Lanterne japonaise : l'icône de Evenn                             */
 /* ------------------------------------------------------------------ */
 
 function Lantern({ className }: { className?: string }) {

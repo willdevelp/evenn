@@ -5,6 +5,8 @@ import { Container } from "@/src/components/ui/container";
 import EmptyState from "@/src/components/ui/empty-state";
 import ContestCard from "@/src/components/vote/contest-card";
 import { cn } from "@/lib/utils";
+import Header from "@/src/components/ui/header";
+import Footer from "@/src/components/ui/footer";
 
 export const dynamic = "force-dynamic";
 
@@ -50,12 +52,14 @@ export default async function VoteIndexPage() {
   );
 
   return (
+    <>
+      <Header />
     <main className="bg-surface pb-20 text-slate-700">
       {/* ===== EN-TÊTE ===== */}
       <section className="relative isolate overflow-hidden bg-brand-600 text-white">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)] bg-[size:40px_40px]"
+          className="full-grid-accent pointer-events-none absolute inset-0"
         />
         <div
           aria-hidden
@@ -72,7 +76,7 @@ export default async function VoteIndexPage() {
             <h1 className="max-w-3xl text-balance text-4xl font-bold leading-[1.06] tracking-tight sm:text-5xl lg:text-6xl">
               Faites gagner votre talent préféré.
             </h1>
-            <p className="mt-5 max-w-xl text-base leading-7 text-brand-50/90 sm:text-lg sm:leading-8">
+            <p className="mt-5 max-w-xl text-base leading-7 text-[var(--on-accent)]/90 sm:text-lg sm:leading-8">
               Choisissez votre candidat et achetez des votes en toute sécurité : ils sont
               crédités uniquement après vérification du paiement par notre prestataire.
             </p>
@@ -161,5 +165,7 @@ export default async function VoteIndexPage() {
         </p>
       </Container>
     </main>
+      <Footer />
+    </>
   );
 }

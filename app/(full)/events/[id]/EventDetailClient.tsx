@@ -25,6 +25,15 @@ import Image from "next/image";
 import { createReservation } from "@/lib/actions/reservations/create-reservation";
 import { formatEventDate, formatEventDateShort } from "@/lib/event-format";
 
+/*
+  Palette (écrite directement dans les classes) :
+  fond de page    #F5F8FF   surface        #FFFFFF
+  section claire  #EEF5FF   accent doux    #DBEAFE
+  bordures        #E2E8F0   titres         #0F172A
+  texte           #334155   secondaire     #64748B   discret #94A3B8
+  accent          #2563EB   survol         #1D4ED8
+*/
+
 type TicketType = {
   id: string;
   name: string;
@@ -59,6 +68,9 @@ type SimilarEvent = {
   date: string | null;
   price: number | null;
 };
+
+const focusRing =
+  "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#2563EB]/25";
 
 /* ===== MODAL D'ACHAT ===== */
 function PurchaseModal({
@@ -149,7 +161,7 @@ function PurchaseModal({
   };
 
   const inputClass =
-    "mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-normal text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10";
+    "mt-1.5 w-full rounded-xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm font-normal text-[#0F172A] outline-none transition placeholder:text-[#94A3B8] focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/15";
 
   return (
     <div
@@ -159,36 +171,32 @@ function PurchaseModal({
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/70 p-0 backdrop-blur-md sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-[#0F172A]/60 p-0 backdrop-blur-sm sm:items-center sm:p-4"
     >
       <form
         onSubmit={handlePurchase}
-        className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white shadow-pop sm:rounded-2xl"
+        className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white shadow-[0_24px_60px_-20px_rgba(15,23,42,0.45)] sm:rounded-2xl"
       >
-        {/* En-tête bleu */}
-        <div className="relative overflow-hidden bg-brand-600 px-6 pb-6 pt-5 text-white sm:px-8">
-          <div className="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-white/10" />
-          <div className="pointer-events-none absolute -bottom-16 right-10 h-32 w-32 rounded-full bg-white/5" />
-          <div className="relative flex items-start justify-between gap-4">
-            <div>
-              <h3 className="text-xl font-bold">Réserver mes billets</h3>
-              <p className="mt-1 line-clamp-1 text-sm text-brand-100">{eventTitle}</p>
-            </div>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Fermer"
-              className="rounded-xl bg-white/15 p-2 text-white transition hover:bg-white/25 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
-            >
-              <X size={18} />
-            </button>
+        {/* En-tête : clair, l'accent est gardé pour le bouton de confirmation */}
+        <div className="flex items-start justify-between gap-4 border-b border-[#E2E8F0] bg-[#EEF5FF] px-6 pb-5 pt-5 sm:px-8">
+          <div className="min-w-0">
+            <h3 className="text-xl font-bold text-[#0F172A]">Réserver mes billets</h3>
+            <p className="mt-1 line-clamp-1 text-sm text-[#64748B]">{eventTitle}</p>
           </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fermer"
+            className={`rounded-xl border border-[#E2E8F0] bg-white p-2 text-[#334155] transition hover:border-[#2563EB] hover:text-[#1D4ED8] ${focusRing}`}
+          >
+            <X size={18} />
+          </button>
         </div>
 
         <div className="p-6 sm:p-8">
           <div className="space-y-2.5">
             {availableTickets.length === 0 && (
-              <p className="py-6 text-center text-sm text-slate-500">
+              <p className="py-6 text-center text-sm text-[#64748B]">
                 Aucun billet disponible pour le moment.
               </p>
             )}
@@ -199,8 +207,8 @@ function PurchaseModal({
                   key={ticket.id}
                   className={`flex cursor-pointer items-center justify-between gap-3 rounded-2xl border-2 p-4 transition ${
                     active
-                      ? "border-brand-600 bg-brand-50/70"
-                      : "border-slate-200 hover:border-brand-200"
+                      ? "border-[#2563EB] bg-[#EEF5FF]"
+                      : "border-[#E2E8F0] hover:border-[#2563EB]/50"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -208,20 +216,20 @@ function PurchaseModal({
                       type="radio"
                       name="ticketType"
                       checked={active}
-                      className="h-4 w-4 accent-brand-600"
+                      className="h-4 w-4 accent-[#2563EB]"
                       onChange={() => {
                         setSelectedTicketId(ticket.id);
                         setQuantity(1);
                       }}
                     />
                     <div>
-                      <span className="text-sm font-semibold text-slate-900">{ticket.name}</span>
-                      <p className="text-xs text-slate-500">
+                      <span className="text-sm font-semibold text-[#0F172A]">{ticket.name}</span>
+                      <p className="text-xs text-[#64748B]">
                         {Math.max(ticket.quantity - ticket.sold, 0)} place(s) disponible(s)
                       </p>
                     </div>
                   </div>
-                  <span className="whitespace-nowrap text-sm font-bold text-brand-600">
+                  <span className="whitespace-nowrap text-sm font-bold text-[#2563EB]">
                     {ticket.price.toLocaleString("fr-FR")} FCFA
                   </span>
                 </label>
@@ -231,10 +239,10 @@ function PurchaseModal({
 
           {availableTickets.length > 0 && (
             <>
-              <div className="mt-5 flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
-                <label htmlFor="quantity" className="text-sm font-medium text-slate-700">
+              <div className="mt-5 flex items-center justify-between rounded-2xl bg-[#F5F8FF] px-4 py-3">
+                <label htmlFor="quantity" className="text-sm font-medium text-[#334155]">
                   Quantité
-                  <span className="ml-2 text-xs font-normal text-slate-400">max. {maxQuantity}</span>
+                  <span className="ml-2 text-xs font-normal text-[#64748B]">max. {maxQuantity}</span>
                 </label>
                 <input
                   id="quantity"
@@ -250,12 +258,12 @@ function PurchaseModal({
                       ),
                     )
                   }
-                  className="w-20 rounded-xl border border-slate-200 bg-white px-2 py-2 text-center text-sm font-semibold outline-none focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10"
+                  className="w-20 rounded-xl border border-[#E2E8F0] bg-white px-2 py-2 text-center text-sm font-semibold text-[#0F172A] outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/15"
                 />
               </div>
 
               <div className="mt-5 space-y-4">
-                <label className="block text-sm font-medium text-slate-700">
+                <label className="block text-sm font-medium text-[#334155]">
                   Nom complet
                   <input
                     type="text"
@@ -267,7 +275,7 @@ function PurchaseModal({
                     className={inputClass}
                   />
                 </label>
-                <label className="block text-sm font-medium text-slate-700">
+                <label className="block text-sm font-medium text-[#334155]">
                   Adresse email
                   <input
                     type="email"
@@ -278,8 +286,8 @@ function PurchaseModal({
                     className={inputClass}
                   />
                 </label>
-                <label className="block text-sm font-medium text-slate-700">
-                  Téléphone <span className="font-normal text-slate-400">(optionnel)</span>
+                <label className="block text-sm font-medium text-[#334155]">
+                  Téléphone <span className="font-normal text-[#64748B]">(optionnel)</span>
                   <input
                     type="tel"
                     value={buyerPhone}
@@ -290,15 +298,19 @@ function PurchaseModal({
                 </label>
               </div>
 
-              <div className="mt-6 flex items-center justify-between border-t border-dashed border-slate-200 pt-5">
-                <span className="text-sm text-slate-500">Total à payer</span>
-                <span className="text-2xl font-black tracking-tight text-brand-600">
-                  {total.toLocaleString("fr-FR")} <span className="text-sm font-bold">FCFA</span>
+              <div className="mt-6 flex items-center justify-between border-t-2 border-dashed border-[#E2E8F0] pt-5">
+                <span className="text-sm text-[#64748B]">Total à payer</span>
+                <span className="text-2xl font-black tracking-tight text-[#0F172A]">
+                  {total.toLocaleString("fr-FR")}{" "}
+                  <span className="text-sm font-bold text-[#64748B]">FCFA</span>
                 </span>
               </div>
 
               {error && (
-                <p role="alert" className="mt-4 rounded-xl border border-rose-100 bg-rose-50 p-3 text-sm text-rose-700">
+                <p
+                  role="alert"
+                  className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700"
+                >
                   {error}
                 </p>
               )}
@@ -306,12 +318,12 @@ function PurchaseModal({
               <button
                 type="submit"
                 disabled={loading || !selectedTicket}
-                className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 py-4 font-semibold text-white shadow-sm transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-600/30 disabled:opacity-50 disabled:shadow-none"
+                className={`mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#2563EB] py-4 font-semibold text-white shadow-sm transition hover:bg-[#1D4ED8] disabled:opacity-50 disabled:shadow-none ${focusRing}`}
               >
                 {loading ? "Enregistrement..." : "Confirmer la réservation"}
                 {!loading && <ArrowRight size={18} />}
               </button>
-              <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-slate-400">
+              <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-[#64748B]">
                 <QrCode size={13} /> Billet électronique avec QR code, réservation immédiate
               </p>
             </>
@@ -350,12 +362,12 @@ export default function EventDetailClient({
     : null;
 
   const cardClass =
-    "rounded-2xl border border-slate-200/80 bg-white p-6 shadow-card sm:p-8";
+    "rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-[0_8px_24px_-14px_rgba(15,23,42,0.15)] sm:p-8";
 
   return (
-    <main className="min-h-screen bg-surface pb-28 text-slate-900 lg:pb-12">
+    <main className="min-h-screen bg-[#F5F8FF] pb-28 text-[#334155] lg:pb-12">
       {/* ===== HERO ===== */}
-      <div className="relative h-[26rem] w-full overflow-hidden bg-brand-600 md:h-[34rem]">
+      <div className="relative h-[26rem] w-full overflow-hidden bg-[#0F172A] md:h-[34rem]">
         {event.image ? (
           <Image
             src={event.image}
@@ -366,13 +378,12 @@ export default function EventDetailClient({
             className="object-cover"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-white/30">
+          <div className="flex h-full items-center justify-center text-white/20">
             <CalendarDays size={72} strokeWidth={1} />
           </div>
         )}
-        {/* Voile bleu de marque */}
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-600/55 to-brand-600/20 mix-blend-multiply" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
+        {/* Voile sombre pour la lisibilité du titre */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/45 to-[#0F172A]/15" />
 
         <Link
           href="/events"
@@ -382,10 +393,10 @@ export default function EventDetailClient({
         </Link>
 
         <div className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-7xl px-4 pb-24 sm:px-6 md:pb-28 lg:px-8">
-          <span className="mb-4 inline-flex items-center rounded-full bg-white px-3.5 py-1.5 text-xs font-bold text-brand-600 shadow-sm">
+          <span className="mb-4 inline-flex items-center rounded-full bg-[#DBEAFE] px-3.5 py-1.5 text-xs font-bold text-[#1D4ED8]">
             {event.category}
           </span>
-          <h1 className="max-w-3xl text-balance text-4xl font-black leading-[1.05] tracking-tight text-white drop-shadow-sm sm:text-5xl md:text-6xl">
+          <h1 className="max-w-3xl text-balance text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-5xl md:text-6xl">
             {event.title}
           </h1>
         </div>
@@ -393,15 +404,15 @@ export default function EventDetailClient({
 
       {/* ===== INFOS RAPIDES (carte flottante) ===== */}
       <div className="relative z-20 mx-auto -mt-14 max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-200/70 shadow-card-hover sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-[#E2E8F0] bg-[#E2E8F0] shadow-[0_16px_40px_-18px_rgba(15,23,42,0.25)] sm:grid-cols-2 lg:grid-cols-4">
           {quickInfo.map(({ icon: Icon, label, value }) => (
             <div key={label} className="flex items-center gap-4 bg-white p-5 sm:p-6">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-sm">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#DBEAFE] text-[#1D4ED8]">
                 <Icon size={20} />
               </span>
               <div className="min-w-0">
-                <p className="text-xs font-medium text-slate-400">{label}</p>
-                <p className="mt-0.5 truncate font-bold text-slate-900">{value}</p>
+                <p className="text-xs font-medium text-[#64748B]">{label}</p>
+                <p className="mt-0.5 truncate font-bold text-[#0F172A]">{value}</p>
               </div>
             </div>
           ))}
@@ -413,33 +424,33 @@ export default function EventDetailClient({
         {/* Colonne gauche */}
         <div className="space-y-8">
           <section className={cardClass}>
-            <h2 className="mb-4 text-xl font-bold text-slate-950">À propos</h2>
-            <p className="max-w-prose whitespace-pre-line text-[15px] leading-8 text-slate-600">
+            <h2 className="mb-4 text-xl font-bold text-[#0F172A]">À propos</h2>
+            <p className="max-w-prose whitespace-pre-line text-[15px] leading-8 text-[#334155]">
               {event.description || "Aucune description n’a été ajoutée pour cet événement."}
             </p>
           </section>
 
           <section className={cardClass}>
-            <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-slate-950">
-              <MapPin size={20} className="text-brand-600" /> Lieu
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-[#0F172A]">
+              <MapPin size={20} className="text-[#2563EB]" /> Lieu
             </h2>
-            <div className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 text-white">
-              <div className="pointer-events-none absolute -left-8 -top-8 h-40 w-40 rounded-full bg-white/10" />
-              <div className="pointer-events-none absolute -bottom-12 right-6 h-36 w-36 rounded-full bg-white/10" />
-              <div className="relative text-center">
-                <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white text-brand-600 shadow-sm">
+            <div className="flex min-h-44 w-full items-center justify-center rounded-2xl border border-[#DBEAFE] bg-[#EEF5FF] px-4 py-8">
+              <div className="text-center">
+                <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#2563EB] text-white shadow-sm">
                   <MapPin size={22} />
                 </span>
-                <p className="px-4 text-lg font-bold">{event.location || event.city || "Lieu à préciser"}</p>
+                <p className="text-lg font-bold text-[#0F172A]">
+                  {event.location || event.city || "Lieu à préciser"}
+                </p>
                 {event.address && (
-                  <p className="mt-0.5 px-4 text-sm text-brand-100">{event.address}</p>
+                  <p className="mt-0.5 text-sm text-[#64748B]">{event.address}</p>
                 )}
                 {mapsUrl && (
                   <a
                     href={mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-xs font-bold text-brand-700 transition hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
+                    className={`mt-4 inline-flex items-center gap-1.5 rounded-full border border-[#2563EB] bg-white px-4 py-2 text-xs font-bold text-[#2563EB] transition hover:bg-[#2563EB] hover:text-white ${focusRing}`}
                   >
                     <ExternalLink aria-hidden size={13} /> Voir sur la carte
                   </a>
@@ -450,21 +461,21 @@ export default function EventDetailClient({
 
           {similarEvents.length > 0 && (
             <section>
-              <h2 className="mb-4 text-xl font-bold text-slate-950">Événements similaires</h2>
+              <h2 className="mb-4 text-xl font-bold text-[#0F172A]">Événements similaires</h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 {similarEvents.map((e) => (
                   <Link
                     key={e.id}
                     href={`/events/${e.id}`}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-brand-600/40 hover:shadow-card-hover"
+                    className={`group flex items-center justify-between gap-3 rounded-2xl border border-[#E2E8F0] bg-white p-5 transition hover:border-[#2563EB] hover:bg-[#EEF5FF] ${focusRing}`}
                   >
                     <div className="min-w-0">
-                      <h4 className="truncate text-sm font-bold text-slate-900 group-hover:text-brand-600">
+                      <h4 className="truncate text-sm font-bold text-[#0F172A] group-hover:text-[#1D4ED8]">
                         {e.title}
                       </h4>
-                      <p className="mt-1 text-xs text-slate-400">{formatEventDateShort(e.date)}</p>
+                      <p className="mt-1 text-xs text-[#64748B]">{formatEventDateShort(e.date)}</p>
                     </div>
-                    <span className="shrink-0 rounded-full bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-600">
+                    <span className="shrink-0 rounded-full bg-[#DBEAFE] px-3 py-1.5 text-xs font-bold text-[#1D4ED8]">
                       {e.price === null
                         ? "—"
                         : e.price === 0
@@ -480,48 +491,44 @@ export default function EventDetailClient({
 
         {/* Colonne droite : billets */}
         <aside className="lg:col-span-1">
-          <div className="sticky top-24 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-card-hover">
-            {/* En-tête bleu */}
-            <div className="relative overflow-hidden bg-brand-600 p-6 text-white">
-              <div className="pointer-events-none absolute -right-8 -top-10 h-36 w-36 rounded-full bg-white/10" />
-              <div className="pointer-events-none absolute -bottom-14 left-16 h-32 w-32 rounded-full bg-white/5" />
-              <div className="relative">
-                <p className="text-sm text-brand-100">
-                  {startingPrice !== null ? "À partir de" : "Billetterie"}
+          <div className="sticky top-24 overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-[0_16px_40px_-18px_rgba(15,23,42,0.25)]">
+            {/* Le seul aplat bleu de la page : c'est ici qu'on achète */}
+            <div className="bg-[#2563EB] p-6 text-white">
+              <p className="text-sm text-white/85">
+                {startingPrice !== null ? "À partir de" : "Billetterie"}
+              </p>
+              <p className="mt-1 text-4xl font-black tracking-tight">
+                {startingPrice !== null ? (
+                  <>
+                    {startingPrice.toLocaleString("fr-FR")}{" "}
+                    <span className="text-lg font-bold text-white/85">FCFA</span>
+                  </>
+                ) : event.tickets.length === 0 ? (
+                  "Aucune billetterie"
+                ) : (
+                  "Complet"
+                )}
+              </p>
+              {event.attendees > 0 && (
+                <p className="mt-4 flex items-center gap-1.5 text-sm text-white/85">
+                  <Users size={15} /> {event.attendees} billets vendus
                 </p>
-                <p className="mt-1 text-4xl font-black tracking-tight">
-                  {startingPrice !== null ? (
-                    <>
-                      {startingPrice.toLocaleString("fr-FR")}{" "}
-                      <span className="text-lg font-bold text-brand-100">FCFA</span>
-                    </>
-                  ) : (
-                    event.tickets.length === 0 ? "Aucune billetterie" : "Complet"
-                  )}
-                </p>
-                <div className="mt-4 flex items-center gap-4 text-sm text-brand-50">
-                  {event.attendees > 0 && (
-                    <span className="flex items-center gap-1.5">
-                      <Users size={15} /> {event.attendees} billets vendus
-                    </span>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
 
             {/* Perforation façon billet */}
             <div className="relative h-0">
-              <span className="absolute -left-3 -top-3 h-6 w-6 rounded-full bg-surface ring-1 ring-slate-200/80" />
-              <span className="absolute -right-3 -top-3 h-6 w-6 rounded-full bg-surface ring-1 ring-slate-200/80" />
+              <span className="absolute -left-3 -top-3 h-6 w-6 rounded-full bg-[#F5F8FF] ring-1 ring-[#E2E8F0]" />
+              <span className="absolute -right-3 -top-3 h-6 w-6 rounded-full bg-[#F5F8FF] ring-1 ring-[#E2E8F0]" />
             </div>
 
             <div className="space-y-5 p-6">
-              <h2 className="flex items-center gap-2 font-bold text-slate-950">
-                <Ticket size={18} className="text-brand-600" /> Billets
+              <h2 className="flex items-center gap-2 font-bold text-[#0F172A]">
+                <Ticket size={18} className="text-[#2563EB]" /> Billets
               </h2>
               <div className="space-y-2.5">
                 {event.tickets.length === 0 && (
-                  <p className="rounded-2xl border border-dashed border-slate-200 p-4 text-sm text-slate-500">
+                  <p className="rounded-2xl border border-dashed border-[#E2E8F0] p-4 text-sm text-[#64748B]">
                     Cet événement n’a pas de billets à réserver.
                   </p>
                 )}
@@ -530,23 +537,23 @@ export default function EventDetailClient({
                     key={ticket.id}
                     className={`rounded-2xl border p-4 transition ${
                       ticket.available
-                        ? "border-slate-200 bg-white hover:border-brand-600/40"
-                        : "border-slate-100 bg-slate-50 opacity-60"
+                        ? "border-[#E2E8F0] bg-white hover:border-[#2563EB]/50"
+                        : "border-[#E2E8F0] bg-[#F5F8FF] opacity-60"
                     }`}
                   >
                     <div className="flex items-center justify-between gap-3 text-sm">
-                      <span className="font-semibold text-slate-900">{ticket.name}</span>
-                      <span className="whitespace-nowrap font-bold text-brand-600">
+                      <span className="font-semibold text-[#0F172A]">{ticket.name}</span>
+                      <span className="whitespace-nowrap font-bold text-[#2563EB]">
                         {ticket.price.toLocaleString("fr-FR")} FCFA
                       </span>
                     </div>
                     <div className="mt-2 flex items-center justify-between text-xs">
-                      <span className="text-slate-500">
+                      <span className="text-[#64748B]">
                         {Math.max(ticket.quantity - ticket.sold, 0)} place(s) disponible(s)
                       </span>
                       <span
                         className={`inline-flex items-center gap-1 font-semibold ${
-                          ticket.available ? "text-emerald-600" : "text-rose-500"
+                          ticket.available ? "text-emerald-700" : "text-rose-600"
                         }`}
                       >
                         {ticket.available ? <CheckCircle size={13} /> : <XCircle size={13} />}
@@ -560,7 +567,7 @@ export default function EventDetailClient({
               <button
                 onClick={() => setShowPurchaseModal(true)}
                 disabled={!hasAvailableTickets}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 py-4 font-semibold text-white shadow-sm transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-600/30 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+                className={`flex w-full items-center justify-center gap-2 rounded-2xl bg-[#2563EB] py-4 font-semibold text-white shadow-sm transition hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none ${focusRing}`}
               >
                 {hasAvailableTickets
                   ? "Réserver mon billet"
@@ -570,51 +577,46 @@ export default function EventDetailClient({
                 {hasAvailableTickets && <ArrowRight size={18} />}
               </button>
 
-              <p className="flex items-center justify-center gap-1.5 text-xs text-slate-400">
-                <ShieldCheck size={14} className="text-brand-600" /> Réservation sécurisée
+              <p className="flex items-center justify-center gap-1.5 text-xs text-[#64748B]">
+                <ShieldCheck size={14} className="text-[#2563EB]" /> Réservation sécurisée
               </p>
             </div>
           </div>
         </aside>
       </div>
 
-      {/* ===== CTA FINAL ===== */}
+      {/* ===== CTA FINAL : section mise en avant, claire ===== */}
       <section className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-2xl bg-brand-600 px-6 py-14 text-center text-white sm:px-10">
-          <div className="pointer-events-none absolute -left-16 -top-20 h-64 w-64 rounded-full bg-white/10" />
-          <div className="pointer-events-none absolute -bottom-24 -right-10 h-72 w-72 rounded-full bg-white/10" />
-          <div className="pointer-events-none absolute bottom-6 left-1/3 h-24 w-24 rounded-full bg-white/5" />
-          <div className="relative">
-            <h2 className="mx-auto max-w-2xl text-balance text-3xl font-black tracking-tight sm:text-4xl">
-              Vous organisez un événement similaire ?
-            </h2>
-            <p className="mx-auto mt-3 max-w-xl text-brand-100">
-              Publiez-le sur Evenn et touchez votre public.
-            </p>
-            <Link
-              href="/auth/register"
-              className="mt-8 inline-flex items-center gap-2 rounded-2xl bg-white px-7 py-3.5 font-bold text-brand-700 shadow-sm transition hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
-            >
-              Créer mon événement
-              <ArrowRight size={18} />
-            </Link>
-          </div>
+        <div className="rounded-2xl border border-[#DBEAFE] bg-[#EEF5FF] px-6 py-14 text-center sm:px-10">
+          <h2 className="mx-auto max-w-2xl text-balance text-3xl font-black tracking-tight text-[#0F172A] sm:text-4xl">
+            Vous organisez un événement similaire ?
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-[#334155]">
+            Publiez-le sur Evenn et touchez votre public.
+          </p>
+          <Link
+            href="/auth/register"
+            className={`mt-8 inline-flex items-center gap-2 rounded-2xl bg-[#2563EB] px-7 py-3.5 font-bold text-white shadow-sm transition hover:bg-[#1D4ED8] ${focusRing}`}
+          >
+            Créer mon événement
+            <ArrowRight size={18} />
+          </Link>
         </div>
       </section>
 
       {/* ===== BARRE D'ACHAT MOBILE ===== */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/90 px-4 py-3 backdrop-blur-lg lg:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#E2E8F0] bg-white/90 px-4 py-3 backdrop-blur-lg lg:hidden">
         <div className="mx-auto flex max-w-md items-center justify-between gap-4">
           <div>
-            <p className="text-xs text-slate-400">À partir de</p>
-            <p className="text-lg font-black leading-tight text-brand-600">
+            <p className="text-xs text-[#64748B]">À partir de</p>
+            <p className="text-lg font-black leading-tight text-[#0F172A]">
               {startingPrice !== null ? `${startingPrice.toLocaleString("fr-FR")} FCFA` : "Complet"}
             </p>
           </div>
           <button
             onClick={() => setShowPurchaseModal(true)}
             disabled={!hasAvailableTickets}
-            className="flex items-center gap-2 rounded-2xl bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+            className={`flex items-center gap-2 rounded-2xl bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none ${focusRing}`}
           >
             {hasAvailableTickets ? "Réserver" : "Épuisé"}
             {hasAvailableTickets && <ArrowRight size={16} />}

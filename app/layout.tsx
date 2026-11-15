@@ -92,7 +92,7 @@ const instrument = Instrument_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "Evenn — Événements, billetterie et concours",
+    default: "Matsuri — Événements, billetterie et concours",
     template: "%s",
   },
   description:

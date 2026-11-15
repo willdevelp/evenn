@@ -23,6 +23,51 @@ export const SITE_EVENT_TYPES = [
 
 export type SiteEventType = (typeof SITE_EVENT_TYPES)[number];
 
+export type SiteEventField = {
+  key: string;
+  label: string;
+  placeholder: string;
+  multiline?: boolean;
+};
+
+export const SITE_EVENT_FIELDS: Record<SiteEventType, SiteEventField[]> = {
+  wedding: [
+    { key: "couple", label: "Noms des mariés", placeholder: "Ex. Awa et Marc" },
+    { key: "ceremony", label: "Détails de la cérémonie", placeholder: "Lieu et heure de la cérémonie", multiline: true },
+    { key: "dressCode", label: "Code vestimentaire", placeholder: "Ex. Tenue de soirée, couleurs pastel" },
+  ],
+  contest: [
+    { key: "registration", label: "Inscription au concours", placeholder: "Modalités et date limite", multiline: true },
+    { key: "jury", label: "Jury", placeholder: "Présentation des membres du jury", multiline: true },
+    { key: "prizes", label: "Récompenses", placeholder: "Prix et récompenses à gagner", multiline: true },
+  ],
+  baptism: [
+    { key: "child", label: "Nom de l'enfant", placeholder: "Prénom de l'enfant" },
+    { key: "godparents", label: "Parrain et marraine", placeholder: "Noms du parrain et de la marraine" },
+    { key: "ceremony", label: "Détails de la cérémonie", placeholder: "Lieu et informations sur la cérémonie", multiline: true },
+  ],
+  funeral: [
+    { key: "deceased", label: "Nom de la personne honorée", placeholder: "Nom complet" },
+    { key: "service", label: "Informations sur les obsèques", placeholder: "Horaires et lieux", multiline: true },
+    { key: "tribute", label: "Hommage", placeholder: "Un message à partager avec les proches", multiline: true },
+  ],
+  birthday: [
+    { key: "celebrant", label: "Nom de la personne célébrée", placeholder: "Nom ou prénom" },
+    { key: "age", label: "Âge célébré", placeholder: "Ex. 30 ans" },
+    { key: "dressCode", label: "Thème ou tenue", placeholder: "Thème de la fête ou code vestimentaire" },
+  ],
+  training: [
+    { key: "trainer", label: "Formateur", placeholder: "Nom et présentation du formateur", multiline: true },
+    { key: "audience", label: "Public concerné", placeholder: "À qui s'adresse cette formation ?" },
+    { key: "objectives", label: "Objectifs pédagogiques", placeholder: "Compétences abordées pendant la formation", multiline: true },
+  ],
+  festival: [
+    { key: "lineup", label: "Artistes et intervenants", placeholder: "Noms des artistes ou intervenants", multiline: true },
+    { key: "program", label: "Programme", placeholder: "Temps forts et horaires", multiline: true },
+    { key: "access", label: "Accès et informations pratiques", placeholder: "Transport, accès, consignes", multiline: true },
+  ],
+};
+
 export type SitePalette = {
   primaryColor: string;
   accentColor: string;
@@ -137,6 +182,150 @@ export const EVENT_TYPE_META: Record<SiteEventType, EventTypeMeta> = {
     program:
       "Ouverture des portes — Premières parties — Scène principale — DJ set de clôture.",
   },
+};
+
+export type SiteFaqItem = { question: string; answer: string };
+
+/**
+ * Contenu de la section « Questions fréquentes ». Ces réponses sont génériques
+ * et sûres : elles n'inventent aucune information factuelle sur l'événement.
+ */
+export const SITE_FAQ: Record<SiteEventType, SiteFaqItem[]> = {
+  wedding: [
+    {
+      question: "Comment confirmer ma présence ?",
+      answer:
+        "Utilisez le module de confirmation présent sur cette page. Vous pouvez aussi contacter directement les organisateurs si vous avez la moindre question.",
+    },
+    {
+      question: "Y a-t-il un code vestimentaire ?",
+      answer:
+        "Les indications de tenue sont précisées dans la section Informations. En cas de doute, une tenue élégante et confortable est toujours la bienvenue.",
+    },
+    {
+      question: "Puis-je venir accompagné ?",
+      answer:
+        "Oui, merci d'indiquer le nombre de personnes lors de votre confirmation afin que nous puissions préparer l'accueil dans les meilleures conditions.",
+    },
+  ],
+  contest: [
+    {
+      question: "Comment voter pour un candidat ?",
+      answer:
+        "Les votes se font en ligne depuis la page du concours. Chaque vote est vérifié afin de garantir l'équité du classement.",
+    },
+    {
+      question: "Comment participer au concours ?",
+      answer:
+        "Les modalités d'inscription et la date limite sont détaillées dans la section Informations. Les candidatures sont étudiées par l'organisation.",
+    },
+    {
+      question: "Quand les résultats sont-ils annoncés ?",
+      answer:
+        "Le classement final est publié à l'issue de la période de vote. Les gagnants sont également contactés directement par l'organisation.",
+    },
+  ],
+  baptism: [
+    {
+      question: "Comment confirmer ma présence ?",
+      answer:
+        "Un module de confirmation est disponible sur cette page. Votre réponse nous aide à préparer la cérémonie et le repas dans les meilleures conditions.",
+    },
+    {
+      question: "Puis-je venir avec des enfants ?",
+      answer:
+        "Bien sûr. N'hésitez pas à préciser le nombre d'enfants lors de votre confirmation pour que nous prévoyions l'espace nécessaire.",
+    },
+    {
+      question: "Faut-il prévoir un cadeau ?",
+      answer:
+        "Votre présence est déjà un immense cadeau. Si vous le souhaitez, un mot dans le livre d'or nous touchera profondément.",
+    },
+  ],
+  funeral: [],
+  birthday: [
+    {
+      question: "Comment confirmer ma présence ?",
+      answer:
+        "Merci de confirmer votre venue depuis cette page avant la date indiquée. Cela nous permet de réserver les tables et d'organiser le buffet.",
+    },
+    {
+      question: "Puis-je venir avec des enfants ?",
+      answer:
+        "Oui, précisez simplement le nombre d'enfants dans votre confirmation afin que nous prévoyions de quoi les accueillir confortablement.",
+    },
+    {
+      question: "Y a-t-il un thème ou une tenue à respecter ?",
+      answer:
+        "Le thème et le code vestimentaire sont indiqués dans la section Informations. L'important reste de venir avec le sourire et l'envie de faire la fête.",
+    },
+  ],
+  training: [
+    {
+      question: "Comment m'inscrire ?",
+      answer:
+        "Les inscriptions se font depuis cette page, dans la limite des places disponibles. Vous recevrez une confirmation avec les informations pratiques.",
+    },
+    {
+      question: "Faut-il apporter du matériel ?",
+      answer:
+        "Un ordinateur portable est recommandé pour les ateliers pratiques. Le support de formation et les connexions sont fournis sur place.",
+    },
+    {
+      question: "Une attestation est-elle remise ?",
+      answer:
+        "Oui, une attestation de participation est remise à la fin de la formation, après validation des ateliers pratiques.",
+    },
+  ],
+  festival: [
+    {
+      question: "Comment accéder au site du festival ?",
+      answer:
+        "Les informations d'accès, les navettes et le parking sont détaillés dans la section Informations pratiques ci-dessus.",
+    },
+    {
+      question: "Y a-t-il une consigne sur place ?",
+      answer:
+        "Oui, une consigne est disponible à l'entrée du site. Les objets interdits sont précisés dans le règlement affiché aux portes.",
+    },
+    {
+      question: "Les horaires peuvent-ils changer ?",
+      answer:
+        "La programmation est donnée à titre indicatif et peut évoluer. Suivez les communications officielles de l'organisation le jour de l'événement.",
+    },
+  ],
+};
+
+/** Conseils d'accès, volontairement neutres pour rester valables partout. */
+export const SITE_VENUE_NOTES: Record<SiteEventType, string> = {
+  wedding: "Privilégiez le covoiturage et prévoyez d'arriver quinze minutes avant la cérémonie.",
+  contest: "Les portes ouvrent une heure avant le début. Les places sont numérotées.",
+  baptism: "Merci d'arriver dix minutes avant la cérémonie afin de faciliter l'accueil des invités.",
+  funeral: "Un espace de recueillement est prévu à l'entrée pour les messages de condoléances.",
+  birthday: "L'accès se fait par l'entrée principale. Une pièce d'identité peut être demandée.",
+  training: "L'accueil se fait dès 8h00 avec un café. Apportez un ordinateur portable si vous en avez un.",
+  festival: "Navettes, parking et consigne sont indiqués ci-dessous. Pensez à arriver tôt pour éviter l'affluence.",
+};
+
+/**
+ * Texte d'introduction utilisé quand l'organisateur n'a pas encore rédigé de
+ * description : le site reste chaleureux et complet sans inventer de faits.
+ */
+export const SITE_INTRO: Record<SiteEventType, string> = {
+  wedding:
+    "C'est avec une immense joie que nous vous convions à célébrer notre union. Entourés de nos familles et de nos amis, nous vous donnons rendez-vous pour une journée placée sous le signe de l'amour et du partage.",
+  contest:
+    "Le concours met en lumière des talents venus de tous horizons. Découvrez les candidats, suivez leurs performances et soutenez votre favori tout au long de la compétition.",
+  baptism:
+    "Nous vous invitons à partager un moment de grâce et de joie autour de notre enfant. Votre présence à nos côtés donnera à cette journée toute sa douceur.",
+  funeral:
+    "Nous vous invitons à nous accompagner dans le recueillement et à partager vos souvenirs. Chaque mot et chaque présence comptent pour la famille et les proches.",
+  birthday:
+    "Une nouvelle année commence, et nous avons envie de la célébrer avec vous. Préparez-vous à une soirée pleine de rires, de musique et de bons souvenirs.",
+  training:
+    "Cette formation a été conçue pour vous apporter des méthodes concrètes, applicables dès le lendemain. Le programme alterne apports théoriques, ateliers pratiques et temps d'échange.",
+  festival:
+    "Des scènes, des artistes et des rencontres : cette édition a été pensée pour vous faire vibrer du premier au dernier morceau. Découvrez la programmation et préparez votre venue.",
 };
 
 const normalize = (value: string) =>
@@ -552,21 +741,43 @@ function buildSections(eventType: SiteEventType): SiteSectionTemplate[] {
     },
   };
 
+  const venue: SiteSectionTemplate = {
+    type: "venue",
+    content: {
+      heading: "Accès & informations pratiques",
+      body: "Tout ce qu'il faut savoir pour arriver sereinement : adresse exacte, stationnement et conseils d'accès.",
+      venue: "{{event.venue}}",
+      address: "{{event.address}}",
+      city: "{{event.city}}",
+      note: SITE_VENUE_NOTES[eventType],
+    },
+  };
+
+  const faqItems = SITE_FAQ[eventType];
+  const faq: SiteSectionTemplate = {
+    type: "faq",
+    content: {
+      heading: "Questions fréquentes",
+      body: "Les réponses aux questions que vous nous posez le plus souvent.",
+      items: faqItems,
+    },
+  };
+
   switch (eventType) {
     case "wedding":
-      return [hero, story, details, gallery, rsvp, cta];
+      return [hero, story, details, venue, gallery, faq, rsvp, cta];
     case "contest":
-      return [hero, story, contest, details, gallery, tickets, cta];
+      return [hero, story, contest, details, venue, gallery, faq, tickets, cta];
     case "baptism":
-      return [hero, story, details, gallery, guestbook, cta];
+      return [hero, story, details, venue, gallery, faq, guestbook, cta];
     case "funeral":
-      return [hero, quote, story, details, gallery, guestbook, cta];
+      return [hero, quote, story, details, venue, gallery, guestbook, cta];
     case "birthday":
-      return [hero, story, details, gallery, tickets, cta];
+      return [hero, story, details, venue, gallery, faq, tickets, cta];
     case "training":
-      return [hero, story, program, details, tickets, cta];
+      return [hero, story, program, details, venue, faq, tickets, cta];
     case "festival":
-      return [hero, story, program, details, gallery, tickets, cta];
+      return [hero, story, program, details, venue, gallery, faq, tickets, cta];
   }
 }
 

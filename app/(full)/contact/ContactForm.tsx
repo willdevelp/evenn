@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 const inputWrap =
   "relative flex items-center rounded-xl border border-slate-200 bg-white transition focus-within:border-brand-600 focus-within:ring-4 focus-within:ring-brand-600/10";
 
-const inputIcon = "pointer-events-none absolute left-3.5 size-4 text-slate-400";
+const inputIcon = "pointer-events-none absolute left-3.5 size-4 text-slate-500";
 
 const inputClass =
   "w-full rounded-xl border-0 bg-transparent py-3 pl-10 pr-4 text-sm text-slate-800 outline-none placeholder:text-slate-400";
@@ -136,7 +136,7 @@ export default function ContactForm() {
             )}
           </button>
 
-          <p className="flex items-start gap-2 text-xs leading-5 text-slate-400">
+          <p className="flex items-start gap-2 text-xs leading-5 text-slate-500">
             <CircleAlert aria-hidden className="mt-0.5 size-3.5 shrink-0" />
             Les champs marqués d’un astérisque sont requis. Vos données ne sont utilisées que
             pour vous répondre.

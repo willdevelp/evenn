@@ -12,19 +12,30 @@ import {
   Mail,
   MessageCircle,
   Palette,
+  PenLine,
   Sparkles,
   Wand2,
 } from "lucide-react";
 
 import CopyLinkButton from "@/src/components/dashboard/CopyLinkButton";
+import SiteRenderer from "@/src/components/sites/site-renderer";
 import { createEventSite } from "@/lib/actions/sites/create-event-site";
 import {
   SITE_PALETTES,
+  SITE_EVENT_FIELDS,
+  EVENT_TYPE_META,
   type SitePalette,
   type SiteTemplateLayout,
 } from "@/lib/sites/catalog";
+import { resolvePreviewTheme } from "@/lib/sites/design";
+import { buildTemplatePreview } from "@/lib/sites/preview";
 import { getSiteUrl } from "@/lib/sites/url";
-import type { CreatedEventSite, EventSiteContext } from "@/lib/sites/types";
+import type {
+  CreatedEventSite,
+  EventSiteContext,
+  SiteEventSummary,
+  SiteTemplateOption,
+} from "@/lib/sites/types";
 
 const LAYOUT_LABELS: Record<SiteTemplateLayout, string> = {
   centered: "Centré",
@@ -65,81 +76,90 @@ function samePalette(a: SitePalette, b: SitePalette): boolean {
   );
 }
 
-function LayoutThumb({ layout, palette }: { layout: SiteTemplateLayout; palette: SitePalette }) {
-  if (layout === "overlay") {
-    return (
-      <div
-        className="flex h-24 flex-col justify-end p-3"
-        style={{
-          background: `linear-gradient(160deg, ${palette.primaryColor}, ${palette.accentColor})`,
-        }}
-      >
-        <span className="h-2 w-2/3 rounded-full bg-white/90" />
-        <span className="mt-1.5 h-1.5 w-1/2 rounded-full bg-white/50" />
-        <span className="mt-2 h-4 w-14 rounded-full bg-white/25" />
-      </div>
-    );
-  }
-
-  if (layout === "split") {
-    return (
-      <div className="flex h-24 gap-2 p-3" style={{ backgroundColor: palette.backgroundColor }}>
-        <div className="flex flex-1 flex-col justify-center gap-1.5">
-          <span className="h-2 w-3/4 rounded-full" style={{ backgroundColor: palette.primaryColor }} />
-          <span className="h-1.5 w-full rounded-full" style={{ backgroundColor: `${palette.textColor}33` }} />
-          <span className="h-1.5 w-2/3 rounded-full" style={{ backgroundColor: `${palette.textColor}33` }} />
-        </div>
-        <div className="w-1/3 rounded-lg" style={{ backgroundColor: palette.accentColor }} />
-      </div>
-    );
-  }
-
-  if (layout === "minimal") {
-    return (
-      <div
-        className="flex h-24 flex-col justify-center gap-2 px-4"
-        style={{ backgroundColor: palette.backgroundColor }}
-      >
-        <span className="h-1.5 w-10 rounded-full" style={{ backgroundColor: palette.accentColor }} />
-        <span className="h-2.5 w-4/5 rounded-full" style={{ backgroundColor: palette.primaryColor }} />
-        <span className="h-1.5 w-3/5 rounded-full" style={{ backgroundColor: `${palette.textColor}33` }} />
-      </div>
-    );
-  }
+function TemplateThumb({
+  template,
+  event,
+}: {
+  template: SiteTemplateOption;
+  event: SiteEventSummary;
+}) {
+  const { sections, summary } = useMemo(
+    () => buildTemplatePreview(template, event),
+    [template, event],
+  );
+  const theme = useMemo(
+    () => resolvePreviewTheme(template.palette, template.layout, template.key, template.eventType),
+    [template],
+  );
 
   return (
-    <div
-      className="flex h-24 flex-col items-center justify-center gap-1.5 px-4"
-      style={{ backgroundColor: palette.backgroundColor }}
-    >
-      <span className="h-1.5 w-10 rounded-full" style={{ backgroundColor: palette.accentColor }} />
-      <span className="h-2.5 w-4/5 rounded-full" style={{ backgroundColor: palette.primaryColor }} />
-      <span className="h-1.5 w-3/5 rounded-full" style={{ backgroundColor: `${palette.textColor}33` }} />
-      <span className="mt-1 h-4 w-14 rounded-full" style={{ backgroundColor: palette.accentColor }} />
+    <div className="relative h-40 overflow-hidden bg-slate-100">
+      <div
+        className="pointer-events-none absolute left-0 top-0 w-[720px] origin-top-left"
+        style={{ transform: "scale(0.3)" }}
+        aria-hidden="true"
+      >
+        <SiteRenderer
+          compact
+          sections={sections}
+          theme={theme}
+          context={{
+            name: summary.title,
+            eventType: template.eventType,
+            eventTypeLabel: EVENT_TYPE_META[template.eventType].label,
+          }}
+        />
+      </div>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white via-white/60 to-transparent" />
     </div>
   );
 }
 
-function SitePreview({
-  context,
-  palette,
-  layout,
+function LivePreview({
+  template,
+  event,
+  eventDetails,
   subdomain,
-  templateName,
+  palette,
+  domainSuffix,
 }: {
-  context: EventSiteContext;
-  palette: SitePalette;
-  layout: SiteTemplateLayout;
+  template: SiteTemplateOption | null;
+  event: SiteEventSummary;
+  eventDetails: Record<string, string>;
   subdomain: string;
-  templateName: string;
+  palette: SitePalette;
+  domainSuffix: string;
 }) {
-  const url = subdomain.length >= 3 ? getSiteUrl(subdomain).replace(/^https?:\/\//, "") : `${subdomain || "votre-site"}.${context.domainSuffix}`;
-  const isOverlay = layout === "overlay";
-  const isSplit = layout === "split";
-  const isMinimal = layout === "minimal";
+  const preview = useMemo(
+    () => (template ? buildTemplatePreview(template, event, eventDetails) : null),
+    [template, event, eventDetails],
+  );
+  const theme = useMemo(
+    () =>
+      resolvePreviewTheme(
+        palette,
+        template?.layout ?? "centered",
+        template?.key ?? "event-centered",
+        template?.eventType ?? null,
+      ),
+    [palette, template],
+  );
+
+  const url =
+    subdomain.length >= 3
+      ? getSiteUrl(subdomain).replace(/^https?:\/\//, "")
+      : `${subdomain || "votre-site"}.${domainSuffix}`;
+
+  if (!preview) {
+    return (
+      <div className="flex h-72 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 text-center text-sm text-slate-500">
+        Choisissez un modèle pour afficher l&apos;aperçu du site.
+      </div>
+    );
+  }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
       <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2">
         <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
         <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
@@ -147,122 +167,29 @@ function SitePreview({
         <span className="ml-2 flex-1 truncate rounded-md bg-white px-2 py-1 text-[11px] text-slate-500 ring-1 ring-slate-200">
           {url}
         </span>
+        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Live
+        </span>
       </div>
 
-      <div style={{ backgroundColor: palette.backgroundColor, color: palette.textColor }}>
-        <div
-          className={
-            isOverlay
-              ? "relative flex min-h-[220px] flex-col justify-end p-6 text-white"
-              : isSplit
-                ? "grid gap-5 p-6 sm:grid-cols-2 sm:items-center"
-                : isMinimal
-                  ? "px-6 py-8"
-                  : "flex flex-col items-center px-6 py-10 text-center"
-          }
-          style={
-            isOverlay
-              ? {
-                  background: `linear-gradient(150deg, ${palette.primaryColor}, ${palette.accentColor})`,
-                }
-              : undefined
-          }
-        >
-          <div className={isSplit ? "order-2 sm:order-1" : ""}>
-            <span
-              className="inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]"
-              style={
-                isOverlay
-                  ? { backgroundColor: "rgba(255,255,255,0.18)", color: "#fff" }
-                  : { backgroundColor: `${palette.accentColor}22`, color: palette.primaryColor }
-              }
-            >
-              {context.eventTypeLabel}
-            </span>
-            <h3
-              className={`mt-3 font-black tracking-tight ${isMinimal ? "text-2xl" : "text-3xl"}`}
-              style={isOverlay ? undefined : { color: palette.primaryColor }}
-            >
-              {context.event.title}
-            </h3>
-            <p className="mt-2 max-w-sm text-sm leading-6 opacity-80">
-              {context.event.description ||
-                "Ajoutez une description à votre événement pour présenter votre histoire à vos invités."}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-medium">
-              {[context.event.dateLabel, context.event.timeLabel, context.event.location]
-                .filter(Boolean)
-                .map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-full px-2.5 py-1"
-                    style={
-                      isOverlay
-                        ? { backgroundColor: "rgba(255,255,255,0.16)" }
-                        : { backgroundColor: `${palette.primaryColor}12`, color: palette.primaryColor }
-                    }
-                  >
-                    {item}
-                  </span>
-                ))}
-            </div>
-            <span
-              className="mt-5 inline-flex rounded-full px-4 py-2 text-xs font-bold"
-              style={
-                isOverlay
-                  ? { backgroundColor: "#fff", color: palette.primaryColor }
-                  : { backgroundColor: palette.primaryColor, color: "#fff" }
-              }
-            >
-              Découvrir l&apos;événement
-            </span>
-          </div>
-
-          <div
-            className={
-              isSplit
-                ? "order-1 h-32 rounded-2xl sm:order-2"
-                : isOverlay
-                  ? "hidden"
-                  : "mt-6 h-24 w-full max-w-sm rounded-2xl"
-            }
-            style={{
-              background: `linear-gradient(135deg, ${palette.accentColor}, ${palette.primaryColor})`,
-              opacity: isSplit ? 1 : 0.18,
-            }}
-          />
-        </div>
-
-        <div className="grid gap-3 px-6 pb-6 sm:grid-cols-3">
-          {["Informations", "Programme", "Confirmation"].map((label) => (
-            <div
-              key={label}
-              className="rounded-xl border p-3"
-              style={{ borderColor: `${palette.textColor}18` }}
-            >
-              <span
-                className="block h-1.5 w-8 rounded-full"
-                style={{ backgroundColor: palette.accentColor }}
-              />
-              <p className="mt-2 text-xs font-semibold">{label}</p>
-              <span
-                className="mt-2 block h-1.5 w-full rounded-full"
-                style={{ backgroundColor: `${palette.textColor}16` }}
-              />
-              <span
-                className="mt-1.5 block h-1.5 w-2/3 rounded-full"
-                style={{ backgroundColor: `${palette.textColor}16` }}
-              />
-            </div>
-          ))}
-        </div>
+      <div className="h-[540px] overflow-y-auto overscroll-contain bg-white">
+        <SiteRenderer
+          compact
+          sections={preview.sections}
+          theme={theme}
+          context={{
+            name: preview.summary.title,
+            eventType: template?.eventType ?? null,
+            eventTypeLabel: template ? EVENT_TYPE_META[template.eventType].label : "",
+          }}
+        />
       </div>
 
       <div className="flex items-center justify-between gap-2 border-t border-slate-200 bg-white px-4 py-2.5 text-[11px] text-slate-500">
         <span className="inline-flex items-center gap-1.5">
-          <Palette size={12} /> {templateName}
+          <Palette size={12} /> {template?.name ?? "Modèle"}
         </span>
-        <span>{LAYOUT_LABELS[layout]}</span>
+        <span>{LAYOUT_LABELS[template?.layout ?? "centered"]}</span>
       </div>
     </div>
   );
@@ -278,6 +205,7 @@ export default function SiteBuilderClient({ context }: { context: EventSiteConte
   const [subdomain, setSubdomain] = useState(() =>
     defaultSubdomain(context.event.slug, context.event.title),
   );
+  const [eventDetails, setEventDetails] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<CreatedEventSite | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -313,6 +241,7 @@ export default function SiteBuilderClient({ context }: { context: EventSiteConte
           templateId: selectedTemplate.id,
           subdomain,
           theme: palette,
+          eventDetails,
         });
         setCreated(result);
       } catch (submitError) {
@@ -359,6 +288,60 @@ export default function SiteBuilderClient({ context }: { context: EventSiteConte
             <ExternalLink size={16} /> Ouvrir {created.subdomain}
           </a>
         </section>
+
+        {context.eventType ? (
+          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
+                <PenLine size={19} />
+              </span>
+              <div>
+                <h2 className="font-semibold text-slate-900">
+                  Informations spécifiques — {context.eventTypeLabel}
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Ces détails facultatifs seront visibles sur le site public de l&apos;événement.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              {SITE_EVENT_FIELDS[context.eventType].map((field) => (
+                <label key={field.key} className="space-y-1.5">
+                  <span className="text-sm font-medium text-slate-700">{field.label}</span>
+                  {field.multiline ? (
+                    <textarea
+                      value={eventDetails[field.key] ?? ""}
+                      onChange={(event) =>
+                        setEventDetails((current) => ({
+                          ...current,
+                          [field.key]: event.target.value,
+                        }))
+                      }
+                      placeholder={field.placeholder}
+                      maxLength={1000}
+                      rows={3}
+                      className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15"
+                    />
+                  ) : (
+                    <input
+                      value={eventDetails[field.key] ?? ""}
+                      onChange={(event) =>
+                        setEventDetails((current) => ({
+                          ...current,
+                          [field.key]: event.target.value,
+                        }))
+                      }
+                      placeholder={field.placeholder}
+                      maxLength={1000}
+                      className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15"
+                    />
+                  )}
+                </label>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -442,7 +425,7 @@ export default function SiteBuilderClient({ context }: { context: EventSiteConte
                       : "border-slate-200 hover:border-slate-300"
                   }`}
                 >
-                  <LayoutThumb layout={template.layout} palette={template.palette} />
+                  <TemplateThumb template={template} event={context.event} />
                   <div className="space-y-1 p-3">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-sm font-semibold text-slate-900">{template.name}</span>
@@ -621,16 +604,22 @@ export default function SiteBuilderClient({ context }: { context: EventSiteConte
             Aperçu en direct
           </h2>
           <p className="mt-1 text-sm text-slate-500">
-            Les couleurs, le modèle et l&apos;adresse se mettent à jour ici.
+            Le design réel de votre site, rempli avec les informations de l&apos;événement.
+            Les champs vides sont complétés par un contenu d&apos;exemple.
           </p>
         </div>
-        <SitePreview
-          context={context}
-          palette={palette}
-          layout={selectedTemplate?.layout ?? "centered"}
+        <LivePreview
+          template={selectedTemplate}
+          event={context.event}
+          eventDetails={eventDetails}
           subdomain={subdomain}
-          templateName={selectedTemplate?.name ?? "Modèle"}
+          palette={palette}
+          domainSuffix={context.domainSuffix}
         />
+        <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-800">
+          Aperçu de démonstration : les informations non renseignées (description, lieu, visuel)
+          sont remplacées par un exemple. Le site publié n&apos;affichera que vos vraies données.
+        </p>
         <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
           <p className="flex items-center gap-2 font-semibold text-slate-800">
             <Globe2 size={16} className="text-[#2563EB]" /> Adresse publique

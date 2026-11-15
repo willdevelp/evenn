@@ -192,6 +192,7 @@ export async function getEventsById(
         SELECT starts_at, ends_at
         FROM event_dates
         WHERE event_id = e.id
+          AND COALESCE(ends_at, starts_at) > now()
         ORDER BY starts_at ASC
         LIMIT 1
       ) d ON TRUE
@@ -199,7 +200,11 @@ export async function getEventsById(
         e.id = $1
         AND e.deleted_at IS NULL
         AND e.status::text = 'published'
-        AND e.visibility::text = 'public'`,
+        AND e.visibility::text = 'public'
+        AND (
+          d.starts_at IS NOT NULL
+          OR NOT EXISTS (SELECT 1 FROM event_dates ed WHERE ed.event_id = e.id)
+        )`,
     [id]
   );
 
@@ -321,6 +326,7 @@ export async function getSimilarEvents(
          SELECT starts_at
            FROM event_dates
           WHERE event_id = e.id
+            AND COALESCE(ends_at, starts_at) > now()
           ORDER BY starts_at ASC
           LIMIT 1
        ) d ON TRUE
@@ -330,6 +336,10 @@ export async function getSimilarEvents(
         AND e.deleted_at IS NULL
         AND e.status::text = 'published'
         AND e.visibility::text = 'public'
+        AND (
+          d.starts_at IS NOT NULL
+          OR NOT EXISTS (SELECT 1 FROM event_dates ed WHERE ed.event_id = e.id)
+        )
         AND (
           ($2::uuid IS NOT NULL AND e.category_id = $2::uuid)
           OR ($3::text IS NOT NULL AND lower(e.city) = lower($3::text))

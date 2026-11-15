@@ -31,14 +31,6 @@ export type VoteCategoryView = {
   candidates: VoteCandidateView[];
 };
 
-export type VotePackView = {
-  id: string;
-  name: string;
-  votesCount: number;
-  priceAmount: number;
-  sortOrder: number;
-};
-
 export type ContestVotePage = {
   id: string;
   organizationName: string | null;
@@ -57,7 +49,6 @@ export type ContestVotePage = {
   results: ResultsDisplay;
   isOpen: boolean;
   categories: VoteCategoryView[];
-  packs: VotePackView[];
   totalCandidates: number;
   totalVotes: number | null;
 };
@@ -97,17 +88,9 @@ type CandidateRow = {
   vote_count: string;
 };
 
-type PackRow = {
-  id: string;
-  name: string;
-  votes_count: number;
-  price_amount: string;
-  sort_order: number;
-};
-
 /**
  * Charge la page publique d'un concours : informations, catégories, candidats
- * approuvés, classement (selon `results_visibility`) et packs de votes.
+ * approuvés et classement (selon `results_visibility`).
  *
  * Les montants `bigint` et `vote_count` sont convertis en `number` : `pg` les
  * renvoie sous forme de chaînes, contrairement aux types Supabase générés.
@@ -144,7 +127,7 @@ export async function getContestVotePage(slug: string): Promise<ContestVotePage 
   const contest = contestRows[0];
   if (!contest) return null;
 
-  const [categoriesResult, candidatesResult, packsResult] = await Promise.all([
+  const [categoriesResult, candidatesResult] = await Promise.all([
     pool.query<CategoryRow>(
       `SELECT id, name, description, sort_order
          FROM contest_categories
@@ -158,14 +141,6 @@ export async function getContestVotePage(slug: string): Promise<ContestVotePage 
         WHERE contest_id = $1
           AND status = 'approved'
         ORDER BY vote_count DESC, name ASC`,
-      [contest.id],
-    ),
-    pool.query<PackRow>(
-      `SELECT id, name, votes_count, price_amount, sort_order
-         FROM vote_packs
-        WHERE contest_id = $1
-          AND is_active = TRUE
-        ORDER BY sort_order ASC, votes_count ASC`,
       [contest.id],
     ),
   ]);
@@ -238,13 +213,6 @@ export async function getContestVotePage(slug: string): Promise<ContestVotePage 
       endsAt: contest.ends_at,
     }),
     categories: visibleCategories,
-    packs: packsResult.rows.map((pack) => ({
-      id: pack.id,
-      name: pack.name,
-      votesCount: pack.votes_count,
-      priceAmount: Number(pack.price_amount),
-      sortOrder: pack.sort_order,
-    })),
     totalCandidates: candidates.length,
     totalVotes: results.showCounts
       ? candidates.reduce((sum, candidate) => sum + (candidate.voteCount ?? 0), 0)
